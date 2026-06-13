@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Clients Get",
+  "description": "Successful Response",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+        },
+        "page_size": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      }
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifies a single client."
+          },
+          "name": {
+            "type": "string"
+          },
+          "billing_name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contact_first_name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contact_last_name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contact_email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contact_phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contact_extension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "created_at": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Campaigns Addons Get",
+  "description": "Successful Response",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+        },
+        "page_size": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      }
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifies a single add-on."
+          },
+          "lineage": {
+            "type": "string"
+          },
+          "campaign_id": {
+            "type": "string",
+            "description": "Identifies a single campaign."
+          },
+          "name": {
+            "type": "string",
+            "description": "The add-on's name."
+          },
+          "start_date": {
+            "type": "string",
+            "description": "The add-on's start date."
+          },
+          "end_date": {
+            "type": "string",
+            "description": "The add-on's end date."
+          },
+          "addon_spend_contracted": {
+            "type": "number",
+            "description": "The amount contracted to spend on the add-on."
+          },
+          "addon_spend": {
+            "type": "number",
+            "description": "The amount actually spent on the add-on."
+          },
+          "media_plan": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Identifies a single media plan."
+              },
+              "name": {
+                "type": "string",
+                "description": "The media plan's name."
+              },
+              "approval_version": {
+                "type": "number"
+              },
+              "approved_at": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

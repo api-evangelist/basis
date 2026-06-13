@@ -1,0 +1,305 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Stats Get",
+  "description": "Successful Response",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+        },
+        "page_size": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      }
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "line_item_id": {
+            "type": "string",
+            "description": "Present for all scopes.<br>Identifies a single line item."
+          },
+          "line_item_lineage_id": {
+            "type": "string",
+            "description": "Identifies a single line item across revisions."
+          },
+          "delivery_source_id": {
+            "type": "string",
+            "description": "Present for daily and daily_by_conversion scopes.<br>Identifies a single delivery source."
+          },
+          "creative_id": {
+            "description": "Present for daily and daily_by_conversion scopes.<br>Identifies a single creative.",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "external_ad_ref": {
+            "description": "Present for daily and daily_by_conversion scopes.<br>Identifies a single ad on the external source.",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "conversion_id": {
+            "type": "string",
+            "description": "Present for daily_by_conversion scope.<br>Identifies a single conversion."
+          },
+          "delivered_date": {
+            "type": "string",
+            "description": "Present for daily_by_line_item and daily_by_conversion scopes.<br>The date the delivery took place."
+          },
+          "actual_start_date": {
+            "type": "string",
+            "description": "Present for line_item scope.<br>First day Basis received delivery greater than zero for any delivery metric within the contracted flight range."
+          },
+          "data_through_date": {
+            "type": "string",
+            "description": "Present for line_item scope.<br>Date stamp of the last day of delivery."
+          },
+          "delivery_metrics": {
+            "type": "object",
+            "description": "Present for line_item, daily_by_line_item, and daily scopes.",
+            "required": [
+              "delivered_impressions",
+              "delivered_clicks",
+              "delivered_eligible_impressions",
+              "delivered_measurable_impressions",
+              "delivered_viewable_impressions",
+              "delivered_interactions",
+              "delivered_video_starts",
+              "delivered_video_completions",
+              "delivered_total_view_conversions",
+              "delivered_total_click_conversions",
+              "delivered_total_conversions",
+              "delivered_cpa_view_conversions",
+              "delivered_cpa_click_conversions",
+              "delivered_cpa_total_conversions",
+              "delivered_impressions_raw"
+            ],
+            "properties": {
+              "delivered_units": {
+                "type": "number",
+                "description": "Impressions, clicks, views, or actions delivered. The definition of a unit depends on the line item's chosen rate type."
+              },
+              "delivered_impressions": {
+                "type": "number",
+                "description": "Impressions delivered, rounded to a whole number."
+              },
+              "delivered_impressions_raw": {
+                "type": "number",
+                "description": "Impressions delivered, including partial impressions."
+              },
+              "delivered_clicks": {
+                "type": "number",
+                "description": "Clicks recorded."
+              },
+              "delivered_eligible_impressions": {
+                "type": "number",
+                "description": "Impressions delivered against which Basis can measure viewability."
+              },
+              "delivered_measurable_impressions": {
+                "type": "number",
+                "description": "Impressions delivered where our viewability provider's script was able to determine if they were viewable or not."
+              },
+              "delivered_viewable_impressions": {
+                "type": "number",
+                "description": "Delivered impressions that our viewability provider's script was able to deem viewable."
+              },
+              "delivered_interactions": {
+                "type": "number",
+                "description": "Delivered impressions that were expanded or engaged."
+              },
+              "delivered_video_starts": {
+                "type": "number",
+                "description": "The number of times a video creative was started."
+              },
+              "delivered_video_completions": {
+                "type": "number",
+                "description": "Video impressions that completed (reached the fourth quartile marker)."
+              },
+              "delivered_total_view_conversions": {
+                "type": "number",
+                "description": "View-through conversions, recorded after a user saw an ad from the campaign but did not click through."
+              },
+              "delivered_total_click_conversions": {
+                "type": "number",
+                "description": "Click-through conversions, recorded after a user clicked an ad in the line item."
+              },
+              "delivered_total_conversions": {
+                "type": "number",
+                "description": "All click-through and view-through conversions added together."
+              },
+              "delivered_cpa_view_conversions": {
+                "type": "number",
+                "description": "Cost per action for view-through conversions."
+              },
+              "delivered_cpa_click_conversions": {
+                "type": "number",
+                "description": "Cost per action for click-through conversions."
+              },
+              "delivered_cpa_total_conversions": {
+                "type": "number",
+                "description": "Cost per action for total conversions (click-through and view-through combined)."
+              },
+              "delivered_inventory_spend": {
+                "type": "number",
+                "description": "Dollar amount spent on media inventory only."
+              },
+              "delivered_data_spend": {
+                "type": "number",
+                "description": "Dollar amount spent on data services used to serve media inventory."
+              },
+              "total_spend": {
+                "type": "number",
+                "description": "Present for line_item and daily_by_line_item scopes.<br>Comprehensive amount of purchases based on billable delivery."
+              },
+              "media_spend": {
+                "type": "number",
+                "description": "Present for line_item and daily_by_line_item scopes.<br>Dollar amount spent on media."
+              },
+              "ad_serving_spend": {
+                "type": "number",
+                "description": "Present for line_item and daily_by_line_item scopes.<br>In Basis, Ad Serving is a specified ad server rate and calculated cost."
+              },
+              "auctions_won": {
+                "type": "number",
+                "description": "Number of exchange auctions won."
+              }
+            }
+          },
+          "performance_metrics": {
+            "type": "object",
+            "description": "Present for line_item scope.",
+            "required": [
+              "ecpm",
+              "ecpc",
+              "ecpcv",
+              "ecpv",
+              "ecpvi",
+              "ecpa",
+              "click_through_rate",
+              "pacing_pct_spend",
+              "pacing_pct_units",
+              "projected_balance",
+              "total_unspent",
+              "delivery_spend_pct"
+            ],
+            "properties": {
+              "ecpm": {
+                "type": "number",
+                "description": "Effective cost per mille (CPM), the average cost per 1000 impressions."
+              },
+              "ecpc": {
+                "type": "number",
+                "description": "Effective cost per click."
+              },
+              "ecpcv": {
+                "type": "number",
+                "description": "Effective cost per completed view (applies to video only)."
+              },
+              "ecpv": {
+                "type": "number",
+                "description": "Effective cost per view (applies to video only)."
+              },
+              "ecpvi": {
+                "type": "number",
+                "description": "Effective cost per viewable impression."
+              },
+              "ecpa": {
+                "type": "number",
+                "description": "Effective cost per acquisition."
+              },
+              "click_through_rate": {
+                "type": "number",
+                "description": "Click-through rate (CTR)."
+              },
+              "to_kpi_goal_pct": {
+                "type": "number",
+                "description": "Percentage to track the progress of the KPI Goal."
+              },
+              "pacing_pct_spend": {
+                "type": "number",
+                "description": "Pacing on-schedule indicator, expressed as a percentage of the expected or desired spend to date."
+              },
+              "pacing_pct_units": {
+                "type": "number",
+                "description": "Pacing on-schedule indicator, expressed as a percentage of the expected or desired units delivered to date."
+              },
+              "projected_balance": {
+                "type": "number",
+                "description": "The balance projected if the line item continues delivering at the current pace."
+              },
+              "total_unspent": {
+                "type": "number",
+                "description": "The amount budgeted that hasn't been spent."
+              },
+              "delivery_spend_pct": {
+                "type": "number",
+                "description": "The percent of the budgeted gross that has been spent on delivery."
+              },
+              "target_spend": {
+                "type": "number",
+                "description": "The amount budgeted to be spent by this line item."
+              },
+              "target_units": {
+                "type": "number",
+                "description": "The number of units to be delivered by this line item."
+              }
+            }
+          },
+          "conversion_metrics": {
+            "type": "object",
+            "description": "Present for daily_by_conversion scope.",
+            "required": [
+              "click_conversions",
+              "click_conversion_revenue",
+              "view_conversions",
+              "view_conversion_revenue",
+              "total_conversions",
+              "total_conversion_revenue"
+            ],
+            "properties": {
+              "click_conversions": {
+                "type": "number",
+                "description": "Count of click-through conversions"
+              },
+              "click_conversion_revenue": {
+                "type": "number",
+                "description": "Total revenue associated with click-through conversions"
+              },
+              "view_conversions": {
+                "type": "number",
+                "description": "Count of view-through conversions"
+              },
+              "view_conversion_revenue": {
+                "type": "number",
+                "description": "Total revenue associated with view-through conversions"
+              },
+              "total_conversions": {
+                "type": "number",
+                "description": "Total conversion count"
+              },
+              "total_conversion_revenue": {
+                "type": "number",
+                "description": "Total conversion revenue"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

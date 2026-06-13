@@ -1,0 +1,110 @@
+{
+  "id": {
+    "description": "Identifies a single tactic id. In the absence of this id, all tactics that this user has access to should be returned.",
+    "enum": null
+  },
+  "cursor": {
+    "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page.",
+    "enum": null
+  },
+  "query": {
+    "description": "Used to refine the results by a chosen parameter. Valid parameter = name",
+    "enum": null
+  },
+  "client_id": {
+    "description": "Identifies a single client. Set this parameter to limit the statistics to the specified client.",
+    "enum": null
+  },
+  "campaign_id": {
+    "description": "Identifies a single campaign. Set this parameter to limit the statistics to the specified campaign.",
+    "enum": null
+  },
+  "status": {
+    "description": "",
+    "enum": [
+      "live",
+      "approved",
+      "completed"
+    ]
+  },
+  "brand_id": {
+    "description": "Identifies a single brand. Set this parameter to limit the statistics to the specified brand.",
+    "enum": null
+  },
+  "line_item_id": {
+    "description": "Identifies a single line item. Set this parameter to limit the statistics to the specified line item.",
+    "enum": null
+  },
+  "line_item_lineage_id": {
+    "description": "Identifies a single line item across revisions.",
+    "enum": null
+  },
+  "start_date": {
+    "description": "The earliest date of statistics collection. Format: yyyy-mm-dd",
+    "enum": null
+  },
+  "end_date": {
+    "description": "The last date of statistics collection. Format: yyyy-mm-dd",
+    "enum": null
+  },
+  "scope": {
+    "description": "Statistical aggregation level: line_item, daily_by_line_item, daily, daily_by_conversion.",
+    "enum": null
+  },
+  "line_item": {
+    "description": "A unit describing the details of a media purchase or programmatic buy.",
+    "enum": null
+  },
+  "campaign": {
+    "description": "A collection of line items with a budget, date range, client, and brand.",
+    "enum": null
+  },
+  "tactic": {
+    "description": "A DSP buying unit controlling bidding, targeting, and budget within a group.",
+    "enum": null
+  },
+  "group": {
+    "description": "A collection of tactics for DSP campaign management.",
+    "enum": null
+  },
+  "brand": {
+    "description": "A client brand associated with advertising campaigns.",
+    "enum": null
+  },
+  "client": {
+    "description": "An advertiser organization represented by an agency.",
+    "enum": null
+  },
+  "property": {
+    "description": "Inventory (advertising space) available for sale, often a website or network.",
+    "enum": null
+  },
+  "vendor": {
+    "description": "An entity selling products, content, or ad space (e.g. exchange, publisher).",
+    "enum": null
+  },
+  "vertical": {
+    "description": "Market or category type for a vendor, property, or brand.",
+    "enum": null
+  },
+  "kpi": {
+    "description": "Key Performance Indicator - a measurable goal for campaign performance.",
+    "enum": null
+  },
+  "conversion": {
+    "description": "A tracked user action (click or view) leading to a desired outcome.",
+    "enum": null
+  },
+  "delivery_source": {
+    "description": "The source of delivery data used for statistics (e.g. ad server, DSP).",
+    "enum": null
+  },
+  "creative": {
+    "description": "An ad unit (display, video, audio, native) served in a campaign.",
+    "enum": null
+  },
+  "addon": {
+    "description": "A fee for an additional service billed outside of line items.",
+    "enum": null
+  }
+}

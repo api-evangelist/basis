@@ -1,0 +1,200 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Campaigns Line_Items Get",
+  "description": "Successful Response",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+        },
+        "page_size": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      }
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifies a single line item."
+          },
+          "lineage": {
+            "type": "string"
+          },
+          "campaign_id": {
+            "type": "string",
+            "description": "Identifies a single campaign.",
+            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          },
+          "property_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Identifies a single property.",
+            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          },
+          "vendor_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Identifies a single vendor.",
+            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the line item."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "direct",
+              "dsp"
+            ]
+          },
+          "media_plan": {
+            "type": "string"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "The first day impressions can be delivered for the line item."
+          },
+          "end_date": {
+            "type": "string",
+            "description": "The last day impressions can be delivered for the line item."
+          },
+          "ad_sizes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "An array of eligible creative dimensions."
+          },
+          "formats": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "An array of eligible creative formats (audio, display, interstitial, video)."
+          },
+          "platforms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "An array of eligible platforms (web browser, mobile, tablet)."
+          },
+          "rate_type": {
+            "type": "string",
+            "description": "Determines how cost is measured for the line item (CPM, CPC, flat, etc.)."
+          },
+          "total_spend_contracted": {
+            "type": "number",
+            "description": "The agreed on gross spend."
+          },
+          "amount_gain_loss_contracted": {
+            "type": "number",
+            "description": "The agreed on gain or loss, gross cost - media cost - ad serving cost."
+          },
+          "margin_pct_contracted": {
+            "type": "number",
+            "description": "The agreed margin percentage."
+          },
+          "media_rate": {
+            "type": "number"
+          },
+          "media_contracted_units": {
+            "type": "number",
+            "description": "The agreed-on units (impressions, clicks, video plays, etc.) to be delivered."
+          },
+          "media_spend_contracted": {
+            "type": "number",
+            "description": "The agreed-on amount to spend on media."
+          },
+          "ad_serving_rate_type": {
+            "type": "string",
+            "description": "Determines how ad serving costs are is measured."
+          },
+          "ad_server": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ad_serving_cost": {
+            "type": "number"
+          },
+          "ad_serving_rate": {
+            "type": "number"
+          },
+          "ad_serving_estimated_clicks": {
+            "type": "number"
+          },
+          "ad_serving_estimated_impressions": {
+            "type": "number"
+          },
+          "ad_serving_spend_contracted": {
+            "type": "number"
+          },
+          "kpi_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Identifies a single Key Performance Indicator (KPI).",
+            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          },
+          "kpi_goal": {
+            "type": "number",
+            "description": "The goal set for the Key Performance Indicator (KPI)."
+          },
+          "advertising_channel": {
+            "type": "string",
+            "description": "Identifies the advertising channel a Planning User associated to the line item."
+          }
+        }
+      }
+    },
+    "included": {
+      "type": "object",
+      "properties": {
+        "media_plans": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Identifies a single media plan.",
+                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "approval_version": {
+                "type": "number"
+              },
+              "approved_at": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Groups Get",
+  "description": "Successful Response",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+        },
+        "page_size": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      }
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identifies a single group."
+          },
+          "name": {
+            "type": "string",
+            "description": "The display name for the requested group."
+          },
+          "budget": {
+            "type": "object",
+            "description": "The budget settings for this group.",
+            "properties": {
+              "flight_dates": {
+                "type": "object",
+                "description": "The specific dates under which this group will run.",
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "description": "Start date of the tactics within this group's flight."
+                  },
+                  "to": {
+                    "type": "string",
+                    "description": "End date of the tactics within this group's flight."
+                  }
+                }
+              },
+              "even_delivery_enabled": {
+                "type": "boolean",
+                "description": "Set to True if the budget amount should be evenly delivered throughout the day."
+              },
+              "type": {
+                "type": "string",
+                "description": "Budget type. Possible values are: all_time, daily"
+              },
+              "amount": {
+                "type": "string",
+                "description": "Budget amount, USD"
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "The tactic's status controls whether campaigns in the group can bid on impressions."
+          },
+          "pacing_setting": {
+            "type": "string",
+            "description": "Controls whether budget pacing is controlled at the group or tactic level."
+          }
+        }
+      }
+    }
+  }
+}

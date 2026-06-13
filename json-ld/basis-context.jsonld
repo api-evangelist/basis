@@ -1,0 +1,61 @@
+{
+  "@context": {
+    "@vocab": "https://schema.org/",
+    "basis": "https://api.basis.net/v1/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "id": "@id",
+    "name": "schema:name",
+    "description": "schema:description",
+    "created_at": {
+      "@id": "schema:dateCreated",
+      "@type": "xsd:dateTime"
+    },
+    "start_date": {
+      "@id": "schema:startDate",
+      "@type": "xsd:date"
+    },
+    "end_date": {
+      "@id": "schema:endDate",
+      "@type": "xsd:date"
+    },
+    "email": "schema:email",
+    "Agency": "schema:Organization",
+    "Client": "schema:Organization",
+    "Brand": "schema:Brand",
+    "Campaign": "schema:Offer",
+    "LineItem": "schema:Offer",
+    "Creative": "schema:MediaObject",
+    "Vendor": "schema:Organization",
+    "Property": "schema:WebSite",
+    "Vertical": "schema:category",
+    "KPI": "schema:DefinedTerm",
+    "Conversion": "schema:Action",
+    "Tactic": "schema:PlanAction",
+    "Group": "schema:ItemList",
+    "approved_budget": {
+      "@id": "schema:price",
+      "@type": "xsd:decimal"
+    },
+    "status": "schema:status",
+    "client_id": {
+      "@id": "basis:clients",
+      "@type": "@id"
+    },
+    "brand_id": {
+      "@id": "basis:brands",
+      "@type": "@id"
+    },
+    "campaign_id": {
+      "@id": "basis:campaigns",
+      "@type": "@id"
+    },
+    "vendor_id": {
+      "@id": "basis:vendors",
+      "@type": "@id"
+    },
+    "property_id": {
+      "@id": "basis:properties",
+      "@type": "@id"
+    }
+  }
+}

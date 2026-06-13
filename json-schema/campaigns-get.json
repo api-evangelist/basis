@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Campaigns Get",
+  "description": "Successful Response",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+        },
+        "page_size": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      }
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifies a single campaign."
+          },
+          "name": {
+            "type": "string"
+          },
+          "ugcid": {
+            "type": "string"
+          },
+          "initiative_name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "approved_budget": {
+            "type": "number"
+          },
+          "start_date": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "end_date": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "client_id": {
+            "type": "string",
+            "description": "Identifies a single client."
+          },
+          "brand_id": {
+            "type": "string",
+            "description": "Identifies a single brand."
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "objectives": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Identifies a single objective."
+                },
+                "name": {
+                  "type": "string"
+                },
+                "kpi_name": {
+                  "type": "string"
+                },
+                "goal": {
+                  "type": "number"
+                },
+                "other_objective_type_description": {
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "other_kpi_description": {
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "created_at": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "account_team": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Identifies a single user on the account team."
+            }
+          }
+        }
+      }
+    },
+    "included": {
+      "type": "object",
+      "properties": {
+        "account_team_users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "first_name": {
+                "type": "string"
+              },
+              "last_name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

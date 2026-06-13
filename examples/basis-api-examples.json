@@ -1,0 +1,783 @@
+{
+  "examples": [
+    {
+      "method": "GET",
+      "path": "/v1/me",
+      "description": "Returns the currently authenticated user",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/agency",
+      "description": "Returns details for the agency, the organization representing a buyer.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/brands/{id}",
+      "description": "Returns details for one brand.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/brands",
+      "description": "Lists all brands.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "query",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "client_id",
+          "in": "query",
+          "required": false
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/clients/{id}",
+      "description": "Returns details for one client. An agency can represent multiple clients, and each client can have m",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/clients",
+      "description": "Lists all clients.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "query",
+          "in": "query",
+          "required": false
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/vendors/{id}",
+      "description": "Returns details for one vendor, an entity or organization selling and offering products, content, or",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/vendors",
+      "description": "Lists all vendors, entities or organizations selling and offering products, content, or services for",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "query",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "campaign_id",
+          "in": "query",
+          "required": false
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/properties/{id}",
+      "description": "Returns details for one property--inventory (advertising space) available for sale, often a website ",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/properties",
+      "description": "Lists all properties, inventory (advertising space) available for sale, often websites or networks.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "query",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "campaign_id",
+          "in": "query",
+          "required": false
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/campaigns/{id}",
+      "description": "Returns details for a single campaign.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/campaigns",
+      "description": "Lists all campaigns.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "query",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "client_id",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "status",
+          "in": "query",
+          "required": false
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/campaigns/{campaign_id}/line_items/{id}",
+      "description": "Returns details for a single line item.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "campaign_id",
+          "in": "path",
+          "required": true
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/campaigns/{campaign_id}/line_items",
+      "description": "Lists all line items for one campaign.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "query",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "campaign_id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/campaigns/{campaign_id}/addons/{id}",
+      "description": "Returns details for a single add-on. An add-on is a fee for a service that is billed outside of the ",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "campaign_id",
+          "in": "path",
+          "required": true
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/campaigns/{campaign_id}/addons",
+      "description": "Lists add-ons for a single campaign. An add-on is a fee for an additional service that is billed out",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "query",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "campaign_id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/verticals/{id}",
+      "description": "Returns details for a single vertical, the market or category type for a vendor, property, or brand.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/verticals",
+      "description": "Lists all verticals, the market or category types for a vendor, property, or brand.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "query",
+          "in": "query",
+          "required": false
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/kpis/{id}",
+      "description": "Returns details for a single Key Performance Indicator (KPI).",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/kpis",
+      "description": "Lists all Key Performance Indicators (KPI)",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "query",
+          "in": "query",
+          "required": false
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/creatives/{id}",
+      "description": "Returns details for a single creative.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/creatives",
+      "description": "Lists all creatives.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/delivery_sources/{id}",
+      "description": "Returns details for one delivery source.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/delivery_sources",
+      "description": "Lists all delivery sources, which provide delivery data used for statistics.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/conversions/{id}",
+      "description": "Returns details for a single conversion.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/conversions",
+      "description": "Lists all conversions.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/groups/{id}",
+      "description": "Returns details for a single Group.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/groups",
+      "description": "Lists all Groups.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "query",
+          "in": "query",
+          "required": false
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/tactics/{id}",
+      "description": "Returns details for a single Tactic.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/tactics",
+      "description": "Lists all Tactics.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "query",
+          "in": "query",
+          "required": false
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/stats/{scope}",
+      "description": "Retrieves statistics.",
+      "tags": [
+        "Analytics"
+      ],
+      "parameters": [
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "brand_id",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "client_id",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "campaign_id",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "line_item_id",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "line_item_lineage_id",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "start_date",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "end_date",
+          "in": "query",
+          "required": false
+        },
+        {
+          "name": "scope",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "security": [
+        {
+          "Bearer": [],
+          "OAuth2": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4897 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Basis Platform API",
+    "version": "v1",
+    "description": "\n# Introduction\n\nThe Basis API is designed to be easy to use and simple to test to help customers\nand partners get up and running quickly. Use the API endpoints to connect to\nBasis to retrieve campaign planning and delivery data. The current version of\nthe API is v1.\n\n# Getting Started\n\nThe Basis API is a RESTful API. This means that the API is designed to allow you\nto work with objects using familiar HTTP verbs.\n\n* read = GET\n* create = POST\n* update = PUT\n* delete = DELETE\n\nAll production API requests are made to [https://api.basis.net/v1](https://api.basis.net/v1).\nThere is also a testing sandbox to use when developing and testing applications,\nwith requests being made to [https://api-sandbox.basis.net/v1](https://api-sandbox.basis.net/v1).\nThe Basis API is available to Centro customers and integration partners, and all\norganizations must acquire valid credentials prior to using the web services.\nContact your Centro representative to obtain valid credentials.\n\n#### API Request Limits\n\nTo maintain optimum performance and ensure that the Basis Platform API is available to all our customers,\nBasis balances transaction loads by imposing rate limits of 75,000 requests per hour across all endpoints per API user.\n\nGenerating client credentials tokens is also limited to 10 per hour, with a maximum of 25 per day. More information\non this can be found in the Client Credentials Flow section below.\n\n# Authentication\n\nAll API endpoints require authentication.  Basis API uses [OAuth2](https://oauth.net/2/). Supported grant types:\n\n* [Authorization Code](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow)\n* [Client Credentials](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow)\n* [Refresh Token](https://auth0.com/docs/secure/tokens/refresh-tokens/use-refresh-tokens)\n\nThe password grant flow has now been deprecated. Please update your applications to use one of the above two flows.\n\nIf you encounter any issues or challenges while setting up the OAuth connection, please don't hesitate to contact us\nfor support.\n\nPlease note that OAuth authentication uses `https://auth.basis.net` not `https://api.basis.net`.\n\n#### Authorization Code Flow\n\nTo authorize your API access, visit the following URL in your browser, replacing\nplaceholders with your specific values as needed:\n\n`https://auth.basis.net/authorize?response_type=code&client_id=<client_id>&scope=openid profile email offline_access&state=<your state token>&redirect_uri=<redirect URI>&audience=https://api.basis.net`\n\nAfter successful authorization you will be redirected to your specified redirect\nURI and the authorization code as well as the `state` (more info\n[here](https://www.oauth.com/oauth2-servers/getting-ready/)) supplied in the\nrequest will be passed as parameters.\n\nOnce you have this auth code you will need to make a second request to get a token which\ncan be used to make API requests:\n\n```\ncurl -X POST https://auth.basis.net/oauth/token\n  --header 'Content-Type: application/x-www-form-urlencoded' \\\n  --data-urlencode 'grant_type=authorization_code' \\\n  --data-urlencode 'client_id=<your application ID>' \\\n  --data-urlencode 'client_secret=<your application secret>' \\\n  --data-urlencode 'code=<authorization code>' \\\n  --data-urlencode 'redirect_uri=<your application redirect URI>'\n```\n\nThis token can then be sent along with API requests in the Authorization header as\noutlined in the next section. If you want a refresh token as well, make sure to include\nthe `offline_access` scope in the /authorize request above.\n\nNote: In order to use this flow successfully, your application needs to have an associated\nredirect URI. If you did not previously have a redirect URI set and need to set one, reach\nout to Basis support.\n\n#### Client Credentials Flow\n\n```\ncurl --location 'https://auth.basis.net/oauth/token' \\\n  --header 'Content-Type: application/x-www-form-urlencoded' \\\n  --data-urlencode 'grant_type=client_credentials' \\\n  --data-urlencode 'client_id=<your application ID>' \\\n  --data-urlencode 'client_secret=<your application secret>' \\\n  --data-urlencode 'audience=https://api.basis.net'\n```\n\nA few important notes:\n* Your application must have an associated owner ID (i.e. agency ID) in order to use this flow. \n  It will return a 401 otherwise. If you did not previously have an owner ID set and need to set\n  one, reach out to Basis support.\n* This token returns all clients for an agency, so if there are restricted clients, we recommend\n  using the authorization code flow above.\n* Endpoints providing user information will return a 404, since this token is associated with\n  an organization, not a user.\n\n##### Client Credentials Token Quota\n\nClient credentials token generation is limited to **10 per hour**, with a maximum of **25 per day**.\nIf you exceed this limit, you'll receive a `429 Too Many Requests` error. Please reach out to\nBasis Support if you need to increase this limit.\n\nIf you receive this 429 error, you can check the headers of the response for real-time information\non your current usage and limits. See the\n[official Auth0 docs](https://auth0.com/docs/fine-grained-m2m-token-quotas-early-access#monitor-token-quota-consumption)\nfor more information.\n\n#### Refresh Token Flow\n```\ncurl --location 'https://auth.basis.net/oauth/token' \\\n  --header 'Content-Type: application/x-www-form-urlencoded' \\\n  --data-urlencode 'grant_type=refresh_token' \\\n  --data-urlencode 'client_id=<your application ID>' \\\n  --data-urlencode 'client_secret=<your application secret>' \\\n  --data-urlencode 'refresh_token=<your refresh token>' \\\n```\n\nA few important notes:\n* Only the authorization code flow returns a refresh token.\n* The refresh token can be used to obtain a new access token when the current one expires.\n* The refresh token flow will itself return a refresh token.\n\n#### Request Data\n\nOnce you have your access token from the token response you can make requests to\nthe API with header `Authorization: Bearer <access_token>`.\n\nFor example:\n\n```\ncurl -X GET \"https://api.basis.net/v1/agency\" -H \"Authorization: Bearer <access_token>\"\n```\n\nTo try the endpoints within this documentation, click **Authorize** below, and\nuse a token obtained via any of the above methods to fill in the \"Bearer\" field.\n\n# Analytics API\n\nThe analytics API gives you access to delivery statistics and details of your\nBasis resources:\n\n* agency\n* clients\n* brands\n* campaigns\n* line items\n* groups\n* tactics\n* add-ons\n* vendors\n* properties\n* verticals\n* key performance indicators (KPI)\n\n## Statistics\n\nRetrieve statistics by calling\n\n`GET /v1/stats/{scope}`\n\nUse the scope parameter to choose how the statistics are aggregated:\n\n* line_item\n* daily_by_line_item\n* daily\n\nA line item describes the details of a media purchase or programmatic buy.\nStatistics returned for each line item include delivery metrics, such as\nimpressions, clicks, and video completions, and performance metrics like eCPM,\neCPC, and eCPV.\n\n## Finding Resource Details\n\nMany of the Analytics API endpoints list all of a particular type of resource, like\n\n`GET /v1/brands`\n\nwhich returns a list of all of your brands, as well as the ID, name, creation\ntimestamp, and verticals for each.\n\nMany other endpoints return details for one resource, like\n\n`GET /v1/brands/{id}`\n\nwhich returns the ID, name, creation timestamp, and verticals for the brand with\nthe given brand ID.\n\n### Resource Relationships\n\nCampaigns have\n\n* 1 client\n* 1 brand\n* many line items\n* many add-ons\n\nLine items have\n\n* 1 campaign\n* 1 property\n* 1 vendor\n\nCampaign details returned by `GET /v1/campaigns/{id}` or `GET /v1/campaigns`\ninclude the client_id and brand_id for the campaign. To find the line items for\na campaign, call `GET /v1/campaigns/{id}/line_items`.\n"
+  },
+  "components": {
+    "securitySchemes": {
+      "OAuth2": {},
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {}
+  },
+  "paths": {
+    "/v1/me": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns the currently authenticated user",
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "first_name": {
+                          "type": "string"
+                        },
+                        "last_name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "User not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/agency": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for the agency, the organization representing a buyer.",
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "dsp_advertiser_id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/brands/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for one brand.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single brand."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Identifies a single brand."
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "The name of the brand."
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "verticals": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "Identifies a single vertical."
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "The name of the vertical."
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "description": "The date and time the vertical was added."
+                              },
+                              "subverticals": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "description": "Identifies a single sub-vertical."
+                                    },
+                                    "name": {
+                                      "type": "string",
+                                      "description": "The name of the sub-vertical."
+                                    },
+                                    "created_at": {
+                                      "type": "string",
+                                      "description": "The date and time the sub-vertical was added."
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Brand not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Brand not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/brands": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all brands.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Used to refine the results by a chosen parameter. Valid parameters = name"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "query",
+            "name": "client_id",
+            "required": false,
+            "description": "Identifies a single client. Set this parameter to limit the brands to the specified client."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Identifies a single brand."
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "The name of the brand."
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "verticals": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "description": "Identifies a single vertical."
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "description": "The name of the vertical."
+                                },
+                                "created_at": {
+                                  "type": "string",
+                                  "description": "The date and time the vertical was added."
+                                },
+                                "subverticals": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "id": {
+                                        "type": "string",
+                                        "description": "Identifies a single sub-vertical."
+                                      },
+                                      "name": {
+                                        "type": "string",
+                                        "description": "The name of the sub-vertical."
+                                      },
+                                      "created_at": {
+                                        "type": "string",
+                                        "description": "The date and time the sub-vertical was added."
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/clients/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for one client. An agency can represent multiple clients, and each client can have multiple brands.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single client."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Identifies a single client."
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "billing_name": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "contact_first_name": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "contact_last_name": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "contact_email": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "contact_phone": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "contact_extension": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "notes": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "created_at": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Client not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Client not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/clients": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all clients.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Used to refine the results by a chosen parameter. Valid parameters are name, contact_first_name, contact_last_name, contact_email, billing_name, notes"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Identifies a single client."
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "billing_name": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "contact_first_name": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "contact_last_name": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "contact_email": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "contact_phone": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "contact_extension": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "notes": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "created_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vendors/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for one vendor, an entity or organization selling and offering products, content, or services for payment. Examples of vendors would include the owners of websites that offer advertisement space and exchanges that offers ad space on multiple websites.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single vendor."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Identifies a single vendor."
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vendor not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Vendor not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vendors": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all vendors, entities or organizations selling and offering products, content, or services for payment. Examples of vendors would include the owners of websites that offer advertisement space and exchanges that offers ad space on multiple websites.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Used to refine the results by a chosen parameter. Valid parameters = name"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "query",
+            "name": "campaign_id",
+            "required": false,
+            "description": "Identifies a single campaign."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Identifies a single vendor."
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/properties/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for one property--inventory (advertising space) available for sale, often a website or network.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single property."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Identifies a single property."
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "verticals": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "description": "Identifies a single vertical."
+                          }
+                        }
+                      }
+                    },
+                    "included": {
+                      "type": "object",
+                      "properties": {
+                        "verticals": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Property not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Property not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/properties": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all properties, inventory (advertising space) available for sale, often websites or networks.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Used to refine the results by a chosen parameter. Valid parameters = name"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "query",
+            "name": "campaign_id",
+            "required": false,
+            "description": "Identifies a single campaign."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Identifies a single property."
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "verticals": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "description": "Identifies a single vertical."
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "included": {
+                      "type": "object",
+                      "properties": {
+                        "verticals": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for a single campaign.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single campaign."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Identifies a single campaign."
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "ugcid": {
+                          "type": "string"
+                        },
+                        "initiative_name": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "approved_budget": {
+                          "type": "number"
+                        },
+                        "start_date": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "end_date": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "client_id": {
+                          "type": "string",
+                          "description": "Identifies a single client."
+                        },
+                        "brand_id": {
+                          "type": "string",
+                          "description": "Identifies a single brand."
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "objectives": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "Identifies a single objective."
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "kpi_name": {
+                                "type": "string"
+                              },
+                              "goal": {
+                                "type": "number"
+                              },
+                              "other_objective_type_description": {
+                                "type": [
+                                  "null",
+                                  "string"
+                                ]
+                              },
+                              "other_kpi_description": {
+                                "type": [
+                                  "null",
+                                  "string"
+                                ]
+                              },
+                              "created_at": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "account_team": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "description": "Identifies a single user on the account team."
+                          }
+                        }
+                      }
+                    },
+                    "included": {
+                      "type": "object",
+                      "properties": {
+                        "account_team_users": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "first_name": {
+                                "type": "string"
+                              },
+                              "last_name": {
+                                "type": "string"
+                              },
+                              "email": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Campaign not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Campaign not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all campaigns.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Used to refine the results by a chosen parameter. Valid parameters are name, ugcid, initiative_name"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "query",
+            "name": "client_id",
+            "required": false,
+            "description": "Identifies a single client. Set this parameter to limit the campaigns to the specified client."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "approved",
+                "completed"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Identifies a single campaign."
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "ugcid": {
+                            "type": "string"
+                          },
+                          "initiative_name": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "approved_budget": {
+                            "type": "number"
+                          },
+                          "start_date": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "end_date": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "client_id": {
+                            "type": "string",
+                            "description": "Identifies a single client."
+                          },
+                          "brand_id": {
+                            "type": "string",
+                            "description": "Identifies a single brand."
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "objectives": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "description": "Identifies a single objective."
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "kpi_name": {
+                                  "type": "string"
+                                },
+                                "goal": {
+                                  "type": "number"
+                                },
+                                "other_objective_type_description": {
+                                  "type": [
+                                    "null",
+                                    "string"
+                                  ]
+                                },
+                                "other_kpi_description": {
+                                  "type": [
+                                    "null",
+                                    "string"
+                                  ]
+                                },
+                                "created_at": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "account_team": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "description": "Identifies a single user on the account team."
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "included": {
+                      "type": "object",
+                      "properties": {
+                        "account_team_users": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "first_name": {
+                                "type": "string"
+                              },
+                              "last_name": {
+                                "type": "string"
+                              },
+                              "email": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns/{campaign_id}/line_items/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for a single line item.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "campaign_id",
+            "required": true,
+            "description": "Identifies a single campaign."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single line item."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Identifies a single line item."
+                        },
+                        "lineage": {
+                          "type": "string"
+                        },
+                        "campaign_id": {
+                          "type": "string",
+                          "description": "Identifies a single campaign.",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+                        },
+                        "property_id": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Identifies a single property.",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+                        },
+                        "vendor_id": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Identifies a single vendor.",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "The name of the line item."
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "direct",
+                            "dsp"
+                          ]
+                        },
+                        "media_plan": {
+                          "type": "string"
+                        },
+                        "start_date": {
+                          "type": "string",
+                          "description": "The first day impressions can be delivered for the line item."
+                        },
+                        "end_date": {
+                          "type": "string",
+                          "description": "The last day impressions can be delivered for the line item."
+                        },
+                        "ad_sizes": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "An array of eligible creative dimensions."
+                        },
+                        "formats": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "An array of eligible creative formats (audio, display, interstitial, video)."
+                        },
+                        "platforms": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "An array of eligible platforms (web browser, mobile, tablet)."
+                        },
+                        "rate_type": {
+                          "type": "string",
+                          "description": "Determines how cost is measured for the line item (CPM, CPC, flat, etc.)."
+                        },
+                        "total_spend_contracted": {
+                          "type": "number",
+                          "description": "The agreed on gross spend."
+                        },
+                        "amount_gain_loss_contracted": {
+                          "type": "number",
+                          "description": "The agreed on gain or loss, gross cost - media cost - ad serving cost."
+                        },
+                        "margin_pct_contracted": {
+                          "type": "number",
+                          "description": "The agreed margin percentage."
+                        },
+                        "media_rate": {
+                          "type": "number"
+                        },
+                        "media_contracted_units": {
+                          "type": "number",
+                          "description": "The agreed-on units (impressions, clicks, video plays, etc.) to be delivered."
+                        },
+                        "media_spend_contracted": {
+                          "type": "number",
+                          "description": "The agreed-on amount to spend on media."
+                        },
+                        "ad_serving_rate_type": {
+                          "type": "string",
+                          "description": "Determines how ad serving costs are is measured."
+                        },
+                        "ad_server": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "ad_serving_cost": {
+                          "type": "number"
+                        },
+                        "ad_serving_rate": {
+                          "type": "number"
+                        },
+                        "ad_serving_estimated_clicks": {
+                          "type": "number"
+                        },
+                        "ad_serving_estimated_impressions": {
+                          "type": "number"
+                        },
+                        "ad_serving_spend_contracted": {
+                          "type": "number"
+                        },
+                        "kpi_id": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Identifies a single Key Performance Indicator (KPI).",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+                        },
+                        "kpi_goal": {
+                          "type": "number",
+                          "description": "The goal set for the Key Performance Indicator (KPI)."
+                        },
+                        "advertising_channel": {
+                          "type": "string",
+                          "description": "Identifies the advertising channel a Planning User associated to the line item."
+                        }
+                      }
+                    },
+                    "included": {
+                      "type": "object",
+                      "properties": {
+                        "media_plans": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "Identifies a single media plan.",
+                                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "approval_version": {
+                                "type": "number"
+                              },
+                              "approved_at": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Campaign or line item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Campaign or line item not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns/{campaign_id}/line_items": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all line items for one campaign.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Used to refine the results by a chosen parameter. Valid parameter = name"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "campaign_id",
+            "required": true,
+            "description": "Identifies a single campaign."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Identifies a single line item."
+                          },
+                          "lineage": {
+                            "type": "string"
+                          },
+                          "campaign_id": {
+                            "type": "string",
+                            "description": "Identifies a single campaign.",
+                            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+                          },
+                          "property_id": {
+                            "type": [
+                              "null",
+                              "string"
+                            ],
+                            "description": "Identifies a single property.",
+                            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+                          },
+                          "vendor_id": {
+                            "type": [
+                              "null",
+                              "string"
+                            ],
+                            "description": "Identifies a single vendor.",
+                            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "The name of the line item."
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "direct",
+                              "dsp"
+                            ]
+                          },
+                          "media_plan": {
+                            "type": "string"
+                          },
+                          "start_date": {
+                            "type": "string",
+                            "description": "The first day impressions can be delivered for the line item."
+                          },
+                          "end_date": {
+                            "type": "string",
+                            "description": "The last day impressions can be delivered for the line item."
+                          },
+                          "ad_sizes": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "An array of eligible creative dimensions."
+                          },
+                          "formats": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "An array of eligible creative formats (audio, display, interstitial, video)."
+                          },
+                          "platforms": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "An array of eligible platforms (web browser, mobile, tablet)."
+                          },
+                          "rate_type": {
+                            "type": "string",
+                            "description": "Determines how cost is measured for the line item (CPM, CPC, flat, etc.)."
+                          },
+                          "total_spend_contracted": {
+                            "type": "number",
+                            "description": "The agreed on gross spend."
+                          },
+                          "amount_gain_loss_contracted": {
+                            "type": "number",
+                            "description": "The agreed on gain or loss, gross cost - media cost - ad serving cost."
+                          },
+                          "margin_pct_contracted": {
+                            "type": "number",
+                            "description": "The agreed margin percentage."
+                          },
+                          "media_rate": {
+                            "type": "number"
+                          },
+                          "media_contracted_units": {
+                            "type": "number",
+                            "description": "The agreed-on units (impressions, clicks, video plays, etc.) to be delivered."
+                          },
+                          "media_spend_contracted": {
+                            "type": "number",
+                            "description": "The agreed-on amount to spend on media."
+                          },
+                          "ad_serving_rate_type": {
+                            "type": "string",
+                            "description": "Determines how ad serving costs are is measured."
+                          },
+                          "ad_server": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "ad_serving_cost": {
+                            "type": "number"
+                          },
+                          "ad_serving_rate": {
+                            "type": "number"
+                          },
+                          "ad_serving_estimated_clicks": {
+                            "type": "number"
+                          },
+                          "ad_serving_estimated_impressions": {
+                            "type": "number"
+                          },
+                          "ad_serving_spend_contracted": {
+                            "type": "number"
+                          },
+                          "kpi_id": {
+                            "type": [
+                              "null",
+                              "string"
+                            ],
+                            "description": "Identifies a single Key Performance Indicator (KPI).",
+                            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+                          },
+                          "kpi_goal": {
+                            "type": "number",
+                            "description": "The goal set for the Key Performance Indicator (KPI)."
+                          },
+                          "advertising_channel": {
+                            "type": "string",
+                            "description": "Identifies the advertising channel a Planning User associated to the line item."
+                          }
+                        }
+                      }
+                    },
+                    "included": {
+                      "type": "object",
+                      "properties": {
+                        "media_plans": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "Identifies a single media plan.",
+                                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "approval_version": {
+                                "type": "number"
+                              },
+                              "approved_at": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns/{campaign_id}/addons/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for a single add-on. An add-on is a fee for a service that is billed outside of the campaign's line items.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "campaign_id",
+            "required": true,
+            "description": "Identifies a single campaign."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single add-on."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Identifies a single add-on."
+                        },
+                        "lineage": {
+                          "type": "string"
+                        },
+                        "campaign_id": {
+                          "type": "string",
+                          "description": "Identifies a single campaign."
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "The add-on's name."
+                        },
+                        "start_date": {
+                          "type": "string",
+                          "description": "The add-on's start date."
+                        },
+                        "end_date": {
+                          "type": "string",
+                          "description": "The add-on's end date."
+                        },
+                        "addon_spend_contracted": {
+                          "type": "number",
+                          "description": "The amount contracted to spend on the add-on."
+                        },
+                        "addon_spend": {
+                          "type": "number",
+                          "description": "The amount actually spent on the add-on."
+                        },
+                        "media_plan": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "Identifies a single media plan."
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "The media plan's name."
+                            },
+                            "approval_version": {
+                              "type": "number"
+                            },
+                            "approved_at": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Campaign or add-on not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Campaign or add-on not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns/{campaign_id}/addons": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists add-ons for a single campaign. An add-on is a fee for an additional service that is billed outside of line items.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Used to refine the results by a chosen parameter. Valid parameters = name"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "campaign_id",
+            "required": true,
+            "description": "Identifies a single campaign."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Identifies a single add-on."
+                          },
+                          "lineage": {
+                            "type": "string"
+                          },
+                          "campaign_id": {
+                            "type": "string",
+                            "description": "Identifies a single campaign."
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "The add-on's name."
+                          },
+                          "start_date": {
+                            "type": "string",
+                            "description": "The add-on's start date."
+                          },
+                          "end_date": {
+                            "type": "string",
+                            "description": "The add-on's end date."
+                          },
+                          "addon_spend_contracted": {
+                            "type": "number",
+                            "description": "The amount contracted to spend on the add-on."
+                          },
+                          "addon_spend": {
+                            "type": "number",
+                            "description": "The amount actually spent on the add-on."
+                          },
+                          "media_plan": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "Identifies a single media plan."
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "The media plan's name."
+                              },
+                              "approval_version": {
+                                "type": "number"
+                              },
+                              "approved_at": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Campaign not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Campaign not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/verticals/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for a single vertical, the market or category type for a vendor, property, or brand.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single vertical."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Identifies a single vertical."
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vertical not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Vertical not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/verticals": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all verticals, the market or category types for a vendor, property, or brand.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Used to refine the results by a chosen parameter. Valid parameter = name"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Identifies a single vertical."
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/kpis/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for a single Key Performance Indicator (KPI).",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single Key Performance Indicator (KPI)."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Identifies a single Key Performance Indicator (KPI)."
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "goal_type": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "KPI not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "KPI not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/kpis": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all Key Performance Indicators (KPI)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Used to refine the results by a chosen parameter. Valid parameter = name"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Identifies a single Key Performance Indicator (KPI)."
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "goal_type": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creatives/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for a single creative.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single creative."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Identifies a single creative."
+                        },
+                        "external_source": {
+                          "type": "string",
+                          "enum": [
+                            "gcm",
+                            "sizmek",
+                            "facebook",
+                            "adwords",
+                            "dsp",
+                            "upload",
+                            "linked_in",
+                            "ms_ads"
+                          ]
+                        },
+                        "external_ref": {
+                          "type": "string"
+                        },
+                        "media_type": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "ad_classification": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "pixel_size": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Creative not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Creative not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creatives": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all creatives.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Identifies a single creative."
+                          },
+                          "external_source": {
+                            "type": "string",
+                            "enum": [
+                              "gcm",
+                              "sizmek",
+                              "facebook",
+                              "adwords",
+                              "dsp",
+                              "upload",
+                              "linked_in",
+                              "ms_ads"
+                            ]
+                          },
+                          "external_ref": {
+                            "type": "string"
+                          },
+                          "media_type": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "ad_classification": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "pixel_size": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/delivery_sources/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for one delivery source.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single delivery source."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "The Basis delivery source ID."
+                        },
+                        "external_source": {
+                          "type": "string",
+                          "enum": [
+                            "gcm",
+                            "sizmek",
+                            "facebook",
+                            "adwords",
+                            "dsp",
+                            "upload",
+                            "linked_in",
+                            "ms_ads"
+                          ]
+                        },
+                        "external_id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "size": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Delivery Source not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Delivery Source not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/delivery_sources": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all delivery sources, which provide delivery data used for statistics.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "The Basis delivery source ID."
+                          },
+                          "external_source": {
+                            "type": "string",
+                            "enum": [
+                              "gcm",
+                              "sizmek",
+                              "facebook",
+                              "adwords",
+                              "dsp",
+                              "upload",
+                              "linked_in",
+                              "ms_ads"
+                            ]
+                          },
+                          "external_id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/conversions/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for a single conversion.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9]{40}$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single conversion."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "conversion_id": {
+                          "type": "string",
+                          "description": "Identifies a single conversion."
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "external_source": {
+                          "type": "string",
+                          "enum": [
+                            "gcm",
+                            "sizmek",
+                            "facebook",
+                            "adwords",
+                            "dsp",
+                            "upload",
+                            "linked_in",
+                            "ms_ads"
+                          ]
+                        },
+                        "external_ref": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Conversion not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Conversion not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/conversions": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all conversions.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "conversion_id": {
+                            "type": "string",
+                            "description": "Identifies a single conversion."
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "external_source": {
+                            "type": "string",
+                            "enum": [
+                              "gcm",
+                              "sizmek",
+                              "facebook",
+                              "adwords",
+                              "dsp",
+                              "upload",
+                              "linked_in",
+                              "ms_ads"
+                            ]
+                          },
+                          "external_ref": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/groups/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for a single Group.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]+$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single group id. In the absence of this id, all groups that this user has access to should be returned."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Identifies a single group."
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "The display name for the requested group."
+                        },
+                        "budget": {
+                          "type": "object",
+                          "description": "The budget settings for this group.",
+                          "properties": {
+                            "flight_dates": {
+                              "type": "object",
+                              "description": "The specific dates under which this group will run.",
+                              "properties": {
+                                "from": {
+                                  "type": "string",
+                                  "description": "Start date of the tactics within this group's flight."
+                                },
+                                "to": {
+                                  "type": "string",
+                                  "description": "End date of the tactics within this group's flight."
+                                }
+                              }
+                            },
+                            "even_delivery_enabled": {
+                              "type": "boolean",
+                              "description": "Set to True if the budget amount should be evenly delivered throughout the day."
+                            },
+                            "type": {
+                              "type": "string",
+                              "description": "Budget type. Possible values are: all_time, daily"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "description": "Budget amount, USD"
+                            }
+                          }
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "The tactic's status controls whether campaigns in the group can bid on impressions."
+                        },
+                        "pacing_setting": {
+                          "type": "string",
+                          "description": "Controls whether budget pacing is controlled at the group or tactic level."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Group not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Group not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/groups": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all Groups.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Used to refine the results by a chosen parameter. Valid parameter = name"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "Identifies a single group."
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "The display name for the requested group."
+                          },
+                          "budget": {
+                            "type": "object",
+                            "description": "The budget settings for this group.",
+                            "properties": {
+                              "flight_dates": {
+                                "type": "object",
+                                "description": "The specific dates under which this group will run.",
+                                "properties": {
+                                  "from": {
+                                    "type": "string",
+                                    "description": "Start date of the tactics within this group's flight."
+                                  },
+                                  "to": {
+                                    "type": "string",
+                                    "description": "End date of the tactics within this group's flight."
+                                  }
+                                }
+                              },
+                              "even_delivery_enabled": {
+                                "type": "boolean",
+                                "description": "Set to True if the budget amount should be evenly delivered throughout the day."
+                              },
+                              "type": {
+                                "type": "string",
+                                "description": "Budget type. Possible values are: all_time, daily"
+                              },
+                              "amount": {
+                                "type": "string",
+                                "description": "Budget amount, USD"
+                              }
+                            }
+                          },
+                          "status": {
+                            "type": "string",
+                            "description": "The tactic's status controls whether campaigns in the group can bid on impressions."
+                          },
+                          "pacing_setting": {
+                            "type": "string",
+                            "description": "Controls whether budget pacing is controlled at the group or tactic level."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tactics/{id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Returns details for a single Tactic.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]+$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifies a single tactic id. In the absence of this id, all tactics that this user has access to should be returned."
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Identifies a single tactic."
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "The display name for the requested tactic."
+                        },
+                        "group_id": {
+                          "type": "integer",
+                          "description": "Identifies the single group ID that is a parent of the requested tactic."
+                        },
+                        "budget": {
+                          "type": "object",
+                          "description": "The budget settings for this tactic.",
+                          "properties": {
+                            "amount": {
+                              "type": "string",
+                              "description": "Amount in dollars budgeted for this tactic."
+                            },
+                            "schedule": {
+                              "type": "object",
+                              "description": "The budget scheduling settings applied to this tactic.",
+                              "properties": {
+                                "flight_dates": {
+                                  "type": "object",
+                                  "description": "The specific dates under which this tactic will run.",
+                                  "properties": {
+                                    "from": {
+                                      "type": "string",
+                                      "description": "Start date of tactic flight."
+                                    },
+                                    "to": {
+                                      "type": "string",
+                                      "description": "End date of tactic flight."
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "type": {
+                              "type": "string",
+                              "description": "Type of budget used for this tactic. Possible values are: all_time, daily"
+                            },
+                            "even_delivery_enabled": {
+                              "type": "boolean",
+                              "description": "Set to True if the budget amount should be evenly delivered throughout the day."
+                            },
+                            "pacing_priority": {
+                              "type": "integer",
+                              "description": "How should this tactic be prioritized compared to your other tactics? Default value is 1."
+                            }
+                          }
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "The current status of this tactic. Possible values are: online, offline, archived"
+                        },
+                        "default_bid": {
+                          "type": "number",
+                          "description": "The default bid set for this tactic."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tactic not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Tactic not found",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tactics": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Lists all Tactics.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Used to refine the results by a chosen parameter. Valid parameter = name"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "Identifies a single tactic."
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "The display name for the requested tactic."
+                          },
+                          "group_id": {
+                            "type": "integer",
+                            "description": "Identifies the single group ID that is a parent of the requested tactic."
+                          },
+                          "budget": {
+                            "type": "object",
+                            "description": "The budget settings for this tactic.",
+                            "properties": {
+                              "amount": {
+                                "type": "string",
+                                "description": "Amount in dollars budgeted for this tactic."
+                              },
+                              "schedule": {
+                                "type": "object",
+                                "description": "The budget scheduling settings applied to this tactic.",
+                                "properties": {
+                                  "flight_dates": {
+                                    "type": "object",
+                                    "description": "The specific dates under which this tactic will run.",
+                                    "properties": {
+                                      "from": {
+                                        "type": "string",
+                                        "description": "Start date of tactic flight."
+                                      },
+                                      "to": {
+                                        "type": "string",
+                                        "description": "End date of tactic flight."
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "type": {
+                                "type": "string",
+                                "description": "Type of budget used for this tactic. Possible values are: all_time, daily"
+                              },
+                              "even_delivery_enabled": {
+                                "type": "boolean",
+                                "description": "Set to True if the budget amount should be evenly delivered throughout the day."
+                              },
+                              "pacing_priority": {
+                                "type": "integer",
+                                "description": "How should this tactic be prioritized compared to your other tactics? Default value is 1."
+                              }
+                            }
+                          },
+                          "status": {
+                            "type": "string",
+                            "description": "The current status of this tactic. Possible values are: online, offline, archived"
+                          },
+                          "default_bid": {
+                            "type": "number",
+                            "description": "The default bid set for this tactic."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stats/{scope}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Retrieves statistics.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "query",
+            "name": "brand_id",
+            "required": false,
+            "description": "Identifies a single brand. Set this parameter to limit the statistics to the specified brand."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "query",
+            "name": "client_id",
+            "required": false,
+            "description": "Identifies a single client. Set this parameter to limit the statistics to the specified client."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "query",
+            "name": "campaign_id",
+            "required": false,
+            "description": "Identifies a single campaign. Set this parameter to limit the statistics to the specified campaign."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "query",
+            "name": "line_item_id",
+            "required": false,
+            "description": "Identifies a single line item. Set this parameter to limit the statistics to the specified line item."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "in": "query",
+            "name": "line_item_lineage_id",
+            "required": false,
+            "description": "Identifies a single line item across revisions."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "start_date",
+            "required": false,
+            "description": "The earliest date of statistics collection. Format: yyyy-mm-dd"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "end_date",
+            "required": false,
+            "description": "The last date of statistics collection. Format: yyyy-mm-dd"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "line_item",
+                "daily_by_line_item",
+                "daily",
+                "daily_by_conversion"
+              ]
+            },
+            "in": "path",
+            "name": "scope",
+            "required": true,
+            "description": "\nDefines the granularity and grouping of the statistics to return.<br>\n`line_item:` Statistics show totals for each line item for all days in the date range.<br>\n`daily_by_line_item:` Statistics show totals for each day in the date range for each line item.<br>\n`daily:` Statistics show totals for each day in the date range for each creative.<br>\n`daily_by_conversion:` Statistics show a granular breakout of conversion metrics for each day in the date range.\n"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [],
+            "OAuth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful Response",
+                  "type": "object",
+                  "properties": {
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "line_item_id": {
+                            "type": "string",
+                            "description": "Present for all scopes.<br>Identifies a single line item."
+                          },
+                          "line_item_lineage_id": {
+                            "type": "string",
+                            "description": "Identifies a single line item across revisions."
+                          },
+                          "delivery_source_id": {
+                            "type": "string",
+                            "description": "Present for daily and daily_by_conversion scopes.<br>Identifies a single delivery source."
+                          },
+                          "creative_id": {
+                            "description": "Present for daily and daily_by_conversion scopes.<br>Identifies a single creative.",
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "external_ad_ref": {
+                            "description": "Present for daily and daily_by_conversion scopes.<br>Identifies a single ad on the external source.",
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          "conversion_id": {
+                            "type": "string",
+                            "description": "Present for daily_by_conversion scope.<br>Identifies a single conversion."
+                          },
+                          "delivered_date": {
+                            "type": "string",
+                            "description": "Present for daily_by_line_item and daily_by_conversion scopes.<br>The date the delivery took place."
+                          },
+                          "actual_start_date": {
+                            "type": "string",
+                            "description": "Present for line_item scope.<br>First day Basis received delivery greater than zero for any delivery metric within the contracted flight range."
+                          },
+                          "data_through_date": {
+                            "type": "string",
+                            "description": "Present for line_item scope.<br>Date stamp of the last day of delivery."
+                          },
+                          "delivery_metrics": {
+                            "type": "object",
+                            "description": "Present for line_item, daily_by_line_item, and daily scopes.",
+                            "required": [
+                              "delivered_impressions",
+                              "delivered_clicks",
+                              "delivered_eligible_impressions",
+                              "delivered_measurable_impressions",
+                              "delivered_viewable_impressions",
+                              "delivered_interactions",
+                              "delivered_video_starts",
+                              "delivered_video_completions",
+                              "delivered_total_view_conversions",
+                              "delivered_total_click_conversions",
+                              "delivered_total_conversions",
+                              "delivered_cpa_view_conversions",
+                              "delivered_cpa_click_conversions",
+                              "delivered_cpa_total_conversions",
+                              "delivered_impressions_raw"
+                            ],
+                            "properties": {
+                              "delivered_units": {
+                                "type": "number",
+                                "description": "Impressions, clicks, views, or actions delivered. The definition of a unit depends on the line item's chosen rate type."
+                              },
+                              "delivered_impressions": {
+                                "type": "number",
+                                "description": "Impressions delivered, rounded to a whole number."
+                              },
+                              "delivered_impressions_raw": {
+                                "type": "number",
+                                "description": "Impressions delivered, including partial impressions."
+                              },
+                              "delivered_clicks": {
+                                "type": "number",
+                                "description": "Clicks recorded."
+                              },
+                              "delivered_eligible_impressions": {
+                                "type": "number",
+                                "description": "Impressions delivered against which Basis can measure viewability."
+                              },
+                              "delivered_measurable_impressions": {
+                                "type": "number",
+                                "description": "Impressions delivered where our viewability provider's script was able to determine if they were viewable or not."
+                              },
+                              "delivered_viewable_impressions": {
+                                "type": "number",
+                                "description": "Delivered impressions that our viewability provider's script was able to deem viewable."
+                              },
+                              "delivered_interactions": {
+                                "type": "number",
+                                "description": "Delivered impressions that were expanded or engaged."
+                              },
+                              "delivered_video_starts": {
+                                "type": "number",
+                                "description": "The number of times a video creative was started."
+                              },
+                              "delivered_video_completions": {
+                                "type": "number",
+                                "description": "Video impressions that completed (reached the fourth quartile marker)."
+                              },
+                              "delivered_total_view_conversions": {
+                                "type": "number",
+                                "description": "View-through conversions, recorded after a user saw an ad from the campaign but did not click through."
+                              },
+                              "delivered_total_click_conversions": {
+                                "type": "number",
+                                "description": "Click-through conversions, recorded after a user clicked an ad in the line item."
+                              },
+                              "delivered_total_conversions": {
+                                "type": "number",
+                                "description": "All click-through and view-through conversions added together."
+                              },
+                              "delivered_cpa_view_conversions": {
+                                "type": "number",
+                                "description": "Cost per action for view-through conversions."
+                              },
+                              "delivered_cpa_click_conversions": {
+                                "type": "number",
+                                "description": "Cost per action for click-through conversions."
+                              },
+                              "delivered_cpa_total_conversions": {
+                                "type": "number",
+                                "description": "Cost per action for total conversions (click-through and view-through combined)."
+                              },
+                              "delivered_inventory_spend": {
+                                "type": "number",
+                                "description": "Dollar amount spent on media inventory only."
+                              },
+                              "delivered_data_spend": {
+                                "type": "number",
+                                "description": "Dollar amount spent on data services used to serve media inventory."
+                              },
+                              "total_spend": {
+                                "type": "number",
+                                "description": "Present for line_item and daily_by_line_item scopes.<br>Comprehensive amount of purchases based on billable delivery."
+                              },
+                              "media_spend": {
+                                "type": "number",
+                                "description": "Present for line_item and daily_by_line_item scopes.<br>Dollar amount spent on media."
+                              },
+                              "ad_serving_spend": {
+                                "type": "number",
+                                "description": "Present for line_item and daily_by_line_item scopes.<br>In Basis, Ad Serving is a specified ad server rate and calculated cost."
+                              },
+                              "auctions_won": {
+                                "type": "number",
+                                "description": "Number of exchange auctions won."
+                              }
+                            }
+                          },
+                          "performance_metrics": {
+                            "type": "object",
+                            "description": "Present for line_item scope.",
+                            "required": [
+                              "ecpm",
+                              "ecpc",
+                              "ecpcv",
+                              "ecpv",
+                              "ecpvi",
+                              "ecpa",
+                              "click_through_rate",
+                              "pacing_pct_spend",
+                              "pacing_pct_units",
+                              "projected_balance",
+                              "total_unspent",
+                              "delivery_spend_pct"
+                            ],
+                            "properties": {
+                              "ecpm": {
+                                "type": "number",
+                                "description": "Effective cost per mille (CPM), the average cost per 1000 impressions."
+                              },
+                              "ecpc": {
+                                "type": "number",
+                                "description": "Effective cost per click."
+                              },
+                              "ecpcv": {
+                                "type": "number",
+                                "description": "Effective cost per completed view (applies to video only)."
+                              },
+                              "ecpv": {
+                                "type": "number",
+                                "description": "Effective cost per view (applies to video only)."
+                              },
+                              "ecpvi": {
+                                "type": "number",
+                                "description": "Effective cost per viewable impression."
+                              },
+                              "ecpa": {
+                                "type": "number",
+                                "description": "Effective cost per acquisition."
+                              },
+                              "click_through_rate": {
+                                "type": "number",
+                                "description": "Click-through rate (CTR)."
+                              },
+                              "to_kpi_goal_pct": {
+                                "type": "number",
+                                "description": "Percentage to track the progress of the KPI Goal."
+                              },
+                              "pacing_pct_spend": {
+                                "type": "number",
+                                "description": "Pacing on-schedule indicator, expressed as a percentage of the expected or desired spend to date."
+                              },
+                              "pacing_pct_units": {
+                                "type": "number",
+                                "description": "Pacing on-schedule indicator, expressed as a percentage of the expected or desired units delivered to date."
+                              },
+                              "projected_balance": {
+                                "type": "number",
+                                "description": "The balance projected if the line item continues delivering at the current pace."
+                              },
+                              "total_unspent": {
+                                "type": "number",
+                                "description": "The amount budgeted that hasn't been spent."
+                              },
+                              "delivery_spend_pct": {
+                                "type": "number",
+                                "description": "The percent of the budgeted gross that has been spent on delivery."
+                              },
+                              "target_spend": {
+                                "type": "number",
+                                "description": "The amount budgeted to be spent by this line item."
+                              },
+                              "target_units": {
+                                "type": "number",
+                                "description": "The number of units to be delivered by this line item."
+                              }
+                            }
+                          },
+                          "conversion_metrics": {
+                            "type": "object",
+                            "description": "Present for daily_by_conversion scope.",
+                            "required": [
+                              "click_conversions",
+                              "click_conversion_revenue",
+                              "view_conversions",
+                              "view_conversion_revenue",
+                              "total_conversions",
+                              "total_conversion_revenue"
+                            ],
+                            "properties": {
+                              "click_conversions": {
+                                "type": "number",
+                                "description": "Count of click-through conversions"
+                              },
+                              "click_conversion_revenue": {
+                                "type": "number",
+                                "description": "Total revenue associated with click-through conversions"
+                              },
+                              "view_conversions": {
+                                "type": "number",
+                                "description": "Count of view-through conversions"
+                              },
+                              "view_conversion_revenue": {
+                                "type": "number",
+                                "description": "Total revenue associated with view-through conversions"
+                              },
+                              "total_conversions": {
+                                "type": "number",
+                                "description": "Total conversion count"
+                              },
+                              "total_conversion_revenue": {
+                                "type": "number",
+                                "description": "Total conversion revenue"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad Request",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.basis.net"
+    }
+  ]
+}

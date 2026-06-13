@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Tactics Get",
+  "description": "Successful Response",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "Use this cursor value in your next call to this endpoint to return the next set of items"
+        },
+        "page_size": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      }
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identifies a single tactic."
+          },
+          "name": {
+            "type": "string",
+            "description": "The display name for the requested tactic."
+          },
+          "group_id": {
+            "type": "integer",
+            "description": "Identifies the single group ID that is a parent of the requested tactic."
+          },
+          "budget": {
+            "type": "object",
+            "description": "The budget settings for this tactic.",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "description": "Amount in dollars budgeted for this tactic."
+              },
+              "schedule": {
+                "type": "object",
+                "description": "The budget scheduling settings applied to this tactic.",
+                "properties": {
+                  "flight_dates": {
+                    "type": "object",
+                    "description": "The specific dates under which this tactic will run.",
+                    "properties": {
+                      "from": {
+                        "type": "string",
+                        "description": "Start date of tactic flight."
+                      },
+                      "to": {
+                        "type": "string",
+                        "description": "End date of tactic flight."
+                      }
+                    }
+                  }
+                }
+              },
+              "type": {
+                "type": "string",
+                "description": "Type of budget used for this tactic. Possible values are: all_time, daily"
+              },
+              "even_delivery_enabled": {
+                "type": "boolean",
+                "description": "Set to True if the budget amount should be evenly delivered throughout the day."
+              },
+              "pacing_priority": {
+                "type": "integer",
+                "description": "How should this tactic be prioritized compared to your other tactics? Default value is 1."
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "The current status of this tactic. Possible values are: online, offline, archived"
+          },
+          "default_bid": {
+            "type": "number",
+            "description": "The default bid set for this tactic."
+          }
+        }
+      }
+    }
+  }
+}
