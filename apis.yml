@@ -1,0 +1,58 @@
+aid: basis
+name: Basis
+description: Basis is an advertising automation platform providing REST APIs for programmatic DSP campaign management, audience targeting, publisher management, reporting, and omnichannel media buying automation across display, video, audio, native, connected TV, and site-direct channels.
+image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+url: https://raw.githubusercontent.com/api-evangelist/basis/refs/heads/main/apis.yml
+created: '2026-06-13'
+modified: '2026-06-13'
+specificationVersion: '0.19'
+tags:
+  - Programmatic Advertising
+  - DSP
+  - Media Buying
+  - Campaign Management
+  - Audience Targeting
+  - AdTech
+apis:
+  - aid: basis:basis-enterprise-api
+    name: Basis Enterprise API
+    description: REST API for programmatic DSP campaign management, audience targeting, conversion tracking, and reporting. Supports creating campaigns, tactics, and ads; managing audiences and conversion tracking; and optimizing and analyzing spend across omnichannel media.
+    image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+    humanURL: https://basis.com/technology/enterprise-api
+    baseURL: https://api.basis.net
+    tags:
+      - Campaign Management
+      - DSP
+      - Programmatic Advertising
+      - Reporting
+      - Audience Targeting
+    properties:
+      - type: Documentation
+        url: https://basis.com/technology/enterprise-api
+      - type: OpenAPI
+        url: https://api.basis.net/docs/
+    contact:
+      - FN: Basis Support
+        url: https://basis.com/connect
+common:
+  - type: Website
+    url: https://basis.com/
+  - type: Documentation
+    url: https://basis.com/technology/enterprise-api
+  - type: Blog
+    url: https://basis.com/blog
+  - type: Pricing
+    url: https://basis.com/technology/enterprise-api
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/basis-technologies
+  - type: X
+    url: https://twitter.com/basisglobaltech
+  - type: Plans
+    url: plans/basis-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/basis-rate-limits.yml
+  - type: FinOps
+    url: finops/basis-finops.yml
+maintainers:
+  - FN: Kin Lane
+    email: kin@apievangelist.com

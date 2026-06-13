@@ -1,0 +1,31 @@
+name: Basis Plans & Pricing
+description: Basis does not publish pricing publicly. The platform operates on a custom enterprise pricing model based on agency size, ad spend volume, and required channels. Pricing is negotiated directly with the Basis sales team.
+url: https://basis.com/technology/enterprise-api
+created: '2026-06-13'
+modified: '2026-06-13'
+plans:
+  - name: Enterprise DSP
+    description: Full access to the Basis DSP and omnichannel advertising platform including programmatic, search, social, connected TV, and direct site advertising. Pricing is custom-quoted based on media spend volume and platform scope.
+    url: https://basis.com/technology/enterprise-api
+    pricingModel: custom
+    pricingPage: https://basis.com/connect
+    contact: https://basis.com/connect
+    features:
+      - Programmatic DSP campaign management
+      - Omnichannel media buying (display, video, audio, native, CTV, DOOH)
+      - Enterprise API access for custom integrations
+      - 25000+ audience segments from 30+ data providers
+      - AI-driven optimization across 30+ campaign parameters
+      - 200+ metrics and dimensions for reporting
+      - OAuth 2.0 API authentication
+      - Automated two-way integration with Google Campaign Manager
+      - Search and social platform integrations (Google Ads, Microsoft, Meta, TikTok, Snapchat, Reddit)
+      - Dedicated support team
+      - 99.9% uptime SLA (per integration platform reports)
+    notes:
+      - No minimum spend requirement (as reported by practitioners, not officially confirmed)
+      - Technology fee model - percentage of media spend for programmatic buying
+      - Industry DSP tech fees typically range from 5-15% of gross media spend
+      - Annual contracts typically required for full platform access
+      - Custom implementation and onboarding services available at additional cost
+      - Contact sales for pricing tailored to media spend volume and channel needs

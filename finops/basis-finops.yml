@@ -1,0 +1,41 @@
+name: Basis FinOps
+description: Financial operations guidance for managing costs when using the Basis programmatic advertising platform and Enterprise API. Basis uses a technology fee model based on percentage of media spend rather than a traditional per-call API pricing model.
+url: https://basis.com/technology/enterprise-api
+created: '2026-06-13'
+modified: '2026-06-13'
+costModel:
+  type: percentage-of-spend
+  description: Basis charges a technology fee as a percentage of gross media spend processed through the DSP, plus separate SaaS platform fees for workflow components. No per-API-call charges are publicly documented.
+  notes:
+    - Technology fees are a percentage of gross media spend (industry range 5-15% for platforms at this tier)
+    - SaaS platform fees are separate from per-impression technology fees
+    - Exact percentages are not publicly disclosed and are negotiated directly with Basis sales
+    - No mandatory minimum spend requirement (as reported by practitioners)
+    - Annual contracts are typically required for full platform access
+costDrivers:
+  - name: Programmatic Media Spend
+    description: Primary cost driver. The technology fee applied to all programmatic media spend processed through the Basis DSP.
+    type: percentage-of-spend
+    visibility: negotiated
+  - name: Platform SaaS Fee
+    description: Separate subscription fee for the Basis workflow automation, campaign management, and reporting platform.
+    type: subscription
+    visibility: negotiated
+  - name: Onboarding and Implementation
+    description: Additional costs for implementation services and custom onboarding support.
+    type: one-time
+    visibility: negotiated
+costOptimization:
+  - strategy: Negotiate volume discounts
+    description: Larger agencies with higher media spend can negotiate lower technology fee percentages. The platform is positioned as competitive vs. The Trade Desk and DV360 on pricing.
+  - strategy: No minimum spend requirement
+    description: Unlike some competing DSPs (The Trade Desk $100K+/month, DV360 $50K/month), Basis reportedly has no mandatory minimum spend, reducing risk for smaller budgets.
+  - strategy: Consolidate media buying
+    description: Basis's omnichannel platform consolidates programmatic, search, social, CTV, and direct buys in one system, potentially reducing operational overhead and separate platform fees.
+  - strategy: Use API automation
+    description: The Enterprise API enables workflow automation that can reduce manual campaign management time and associated labor costs. Forrester analysis reports 43% reduction in time for media operations.
+contact: https://basis.com/connect
+notes:
+  - Pricing is custom and must be obtained by contacting Basis sales directly
+  - No self-serve tiers or published pricing on basis.com
+  - Contact basis.com/connect to request a demo and pricing discussion

@@ -1,0 +1,29 @@
+name: Basis API Rate Limits
+description: Basis API rate limit details are not publicly documented. The API includes time-sensitive limits noted by third-party integration partners. Rate limits are enforced on the Basis Platform API (api.basis.net) which uses OAuth 2.0 authentication.
+url: https://basis.com/technology/enterprise-api
+created: '2026-06-13'
+modified: '2026-06-13'
+rateLimits:
+  - name: Historical Data Cutoffs
+    description: Time-sensitive limits on historical data retrieval enforced by the Basis API. These limits make it impossible to pull historical data after specific cut-off dates.
+    scope: data-retrieval
+    limits:
+      - dimension: Country, City, Region metrics
+        historicalLookback: 90 days
+        notes: Data older than 90 days is unavailable for geographic dimensions
+      - dimension: Campaigns, Ads, Audience, Device, OS metrics
+        historicalLookback: 180 days
+        notes: Data older than 180 days is unavailable for campaign and audience dimensions
+    source: AgencyAnalytics integration documentation
+  - name: Data Sync Frequency
+    description: The API supports hourly synchronization with 15-minute refresh cycles available through integration partners.
+    scope: data-sync
+    syncFrequency: hourly
+    refreshCycle: 15 minutes
+    source: Improvado integration documentation
+notes:
+  - Basis does not publicly document specific API rate limits (requests per minute/hour)
+  - Rate limits are enforced but not disclosed in public-facing documentation
+  - Contact Basis directly at basis.com/connect for official rate limit specifications
+  - OAuth 2.0 authentication is required; Client ID, Client Secret, and Advertiser ID are needed
+  - API base URL is https://api.basis.net
