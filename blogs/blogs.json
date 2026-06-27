@@ -2,13 +2,20 @@
   "repo": "basis",
   "feeds": [
     {
+      "source": "https://basis.com/feed",
+      "feed_url": "https://basis.com/feed",
+      "title": "",
+      "saved": 5,
+      "method": "feed"
+    },
+    {
       "source": "https://basis.com/technology/enterprise-api",
       "feed_url": "https://basis.com/feed",
       "title": "",
-      "saved": 3,
+      "saved": 0,
       "method": "discovered"
     }
   ],
-  "post_count": 3,
-  "fetched": "2026-06-14T20:42:17Z"
+  "post_count": 9,
+  "fetched": "2026-06-27T12:03:07Z"
 }
