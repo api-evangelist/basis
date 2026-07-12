@@ -35,6 +35,10 @@ apis:
       - FN: Basis Support
         url: https://basis.com/connect
 common:
+  - type: DomainSecurity
+    url: security/basis-domain-security.yml
+  - type: Authentication
+    url: authentication/basis-authentication.yml
   - type: Website
     url: https://basis.com/
   - type: Documentation

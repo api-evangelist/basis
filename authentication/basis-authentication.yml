@@ -1,0 +1,17 @@
+generated: '2026-07-11'
+method: derived
+source: openapi/basis-platform-api.json
+summary:
+  types:
+  - http
+  - unknown
+schemes:
+- name: OAuth2
+  type: unknown
+  sources:
+  - openapi/basis-platform-api.json
+- name: Bearer
+  type: http
+  scheme: bearer
+  sources:
+  - openapi/basis-platform-api.json
