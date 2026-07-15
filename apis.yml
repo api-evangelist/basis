@@ -35,6 +35,8 @@ apis:
       - FN: Basis Support
         url: https://basis.com/connect
 common:
+  - type: AgenticAccess
+    url: agentic-access/basis-agentic-access.yml
   - type: DomainSecurity
     url: security/basis-domain-security.yml
   - type: Authentication
