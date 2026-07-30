@@ -1,7 +1,20 @@
 aid: basis
 name: Basis
 description: Basis is an advertising automation platform providing REST APIs for programmatic DSP campaign management, audience targeting, publisher management, reporting, and omnichannel media buying automation across display, video, audio, native, connected TV, and site-direct channels.
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+accessModel:
+  pricing: enterprise
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Enterprise · Self-serve signup
+  confidence: high
+  source:
+  - plans
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/basis.png
 url: https://raw.githubusercontent.com/api-evangelist/basis/refs/heads/main/apis.yml
 created: '2026-06-13'
 modified: '2026-06-13'
@@ -14,26 +27,18 @@ tags:
   - Audience Targeting
   - AdTech
 apis:
-  - aid: basis:basis-enterprise-api
-    name: Basis Enterprise API
-    description: REST API for programmatic DSP campaign management, audience targeting, conversion tracking, and reporting. Supports creating campaigns, tactics, and ads; managing audiences and conversion tracking; and optimizing and analyzing spend across omnichannel media.
-    image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
-    humanURL: https://basis.com/technology/enterprise-api
-    baseURL: https://api.basis.net
-    tags:
-      - Campaign Management
-      - DSP
-      - Programmatic Advertising
-      - Reporting
-      - Audience Targeting
-    properties:
-      - type: Documentation
-        url: https://basis.com/technology/enterprise-api
-      - type: OpenAPI
-        url: https://api.basis.net/docs/
-    contact:
-      - FN: Basis Support
-        url: https://basis.com/connect
+- aid: basis:basis-analytics-api
+  name: Basis Analytics API
+  description: The Analytics API from Basis — 31 operation(s) for analytics.
+  humanURL: https://basis.com/technology/enterprise-api
+  baseURL: https://api.basis.net
+  tags:
+  - Analytics
+  properties:
+  - type: OpenAPI
+    url: openapi/basis-analytics-api-openapi.yml
+  - type: Documentation
+    url: https://basis.com/technology/enterprise-api
 common:
   - type: AgenticAccess
     url: agentic-access/basis-agentic-access.yml
