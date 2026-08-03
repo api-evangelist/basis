@@ -1,0 +1,14 @@
+{
+  "provider": "basis",
+  "sources": [
+    "basis-analytics-api-openapi.yml"
+  ],
+  "outputs": [
+    "basis-analytics-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
