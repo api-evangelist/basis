@@ -3,22 +3,39 @@ name: Basis
 description: Basis is an advertising automation platform providing REST APIs for programmatic DSP campaign management, audience targeting, publisher management, reporting, and omnichannel media buying automation across display, video, audio, native, connected TV, and site-direct channels.
 accessModel:
   pricing: enterprise
-  onboarding: self-serve
+  onboarding: contact-sales
   trial: false
   try_now: false
   public: false
-  label: Enterprise · Self-serve signup
+  label: Enterprise · Contact sales for credentials
   confidence: high
   source:
   - plans
   - authentication
-  generated: '2026-07-22'
-  method: derived
+  - https://api.basis.net/swagger.json
+  generated: '2026-08-13'
+  method: searched
+  note: >-
+    Corrected from onboarding "self-serve" on 2026-08-13. Basis's own API
+    documentation states the opposite — "The Basis API is available to Centro
+    customers and integration partners, and all organizations must acquire valid
+    credentials prior to using the web services. Contact your Centro
+    representative to obtain valid credentials." Redirect-URI registration and
+    owner/agency-ID assignment are also handled by a Basis representative.
+    https://platform.basis.net/auth/login is a sign-in for existing customers,
+    not a developer sign-up.
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/basis.png
 url: https://raw.githubusercontent.com/api-evangelist/basis/refs/heads/main/apis.yml
 created: '2026-06-13'
-modified: '2026-06-13'
+modified: '2026-08-13'
 specificationVersion: '0.19'
+x-enrichment:
+  date: '2026-08-13'
+  status: enriched
+  artifacts_added: 18
+  pass: local-v1
+x-coverage:
+  state: covered
 tags:
   - Programmatic Advertising
   - DSP
@@ -39,6 +56,19 @@ apis:
     url: openapi/basis-analytics-api-openapi.yml
   - type: Documentation
     url: https://basis.com/technology/enterprise-api
+  - type: APIReference
+    url: https://api.basis.net/swagger.json
+    name: Basis Platform API specification (OpenAPI 3.0.0, served by Basis)
+  - type: Overlay
+    url: overlays/basis-analytics-api-overlay.yaml
+  - type: Examples
+    url: examples/basis-api-examples.json
+  - type: JSONSchema
+    url: json-schema/
+  - type: Rules
+    url: rules/basis-jsonschema-spectral-rules.yml
+  - type: JSONLD
+    url: json-ld/basis-context.jsonld
 common:
   - type: AgenticAccess
     url: agentic-access/basis-agentic-access.yml
@@ -64,6 +94,44 @@ common:
     url: rate-limits/basis-rate-limits.yml
   - type: FinOps
     url: finops/basis-finops.yml
+  - type: OAuthScopes
+    url: scopes/basis-scopes.yml
+  - type: Conventions
+    url: conventions/basis-conventions.yml
+  - type: ErrorCatalog
+    url: errors/basis-problem-types.yml
+  - type: Lifecycle
+    url: lifecycle/basis-lifecycle.yml
+  - type: Conformance
+    url: conformance/basis-conformance.yml
+  - type: Compliance
+    url: conformance/basis-conformance.yml
+    name: EU-U.S. Data Privacy Framework, IAB member, DAA AdChoices participant
+  - type: DataModel
+    url: data-model/basis-data-model.yml
+  - type: Sandbox
+    url: sandbox/basis-sandbox.yml
+  - type: WellKnown
+    url: well-known/basis-well-known.yml
+    name: OIDC discovery + RFC 8414 metadata served at auth.basis.net
+  - type: MCPServer
+    url: mcp/basis-mcp.yml
+    name: Candidate tool surface derived from the Basis OpenAPI — Basis operates no MCP server
+  - type: LLMsTxt
+    url: llms/basis-llms.txt
+  - type: AgentSkill
+    url: skills/_index.yml
+  - type: Packages
+    url: packages/basis-packages.yml
+    name: No first-party SDK published in any registry
+  - type: Vocabulary
+    url: vocabulary/basis-vocabulary.json
+  - type: SignUp
+    url: https://platform.basis.net/auth/login
+  - type: PrivacyPolicy
+    url: https://privacy.basis.com/
+  - type: Support
+    url: https://basis.com/connect
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
