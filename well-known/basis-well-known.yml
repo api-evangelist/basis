@@ -1,0 +1,103 @@
+generated: '2026-08-13'
+method: searched
+description: >-
+  Results of probing the /.well-known/ discovery surface for every host reachable
+  from apis.yml (basis.com) and the OpenAPI servers[] (https://api.basis.net),
+  plus the OAuth authorization server named in the Basis Platform API description
+  (https://auth.basis.net) and the customer console (https://platform.basis.net).
+  Status is the HTTP code observed at fetch time. Only documents that returned a
+  real, correctly-typed payload were saved verbatim. The Basis console at
+  platform.basis.net answers 200 with a text/html SPA shell for every
+  /.well-known/ path, so those are recorded as present-but-not-a-real-document
+  and were NOT saved and NOT counted as hits.
+hosts:
+  - host: https://api.basis.net
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://auth.basis.net
+    note: >-
+      Auth0-hosted OAuth 2.0 / OpenID Connect authorization server for the Basis
+      Platform API, named in the API's own documentation
+      ("OAuth authentication uses https://auth.basis.net not https://api.basis.net").
+    documents:
+      - path: /.well-known/openid-configuration
+        status: 200
+        type: application/json
+        file: basis-openid-configuration.json
+        note: OIDC Discovery 1.0 document — issuer https://auth.basis.net/.
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        type: application/json
+        file: basis-oauth-authorization-server.json
+        note: >-
+          RFC 8414 authorization-server metadata. Byte-for-byte identical to the
+          OIDC discovery document above (Auth0 serves one document at both paths).
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://basis.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://platform.basis.net
+    note: Customer console. Single-page-app catch-all — see description.
+    documents:
+      - path: /.well-known/security.txt
+        status: 200
+        type: text/html
+        note: SPA shell, not a real security.txt; not saved, not a hit.
+      - path: /.well-known/openid-configuration
+        status: 200
+        type: text/html
+        note: SPA shell, not a real OIDC discovery document; not saved, not a hit.
+      - path: /.well-known/api-catalog
+        status: 200
+        type: text/html
+        note: SPA shell, not a real API catalog; not saved, not a hit.
+      - path: /.well-known/agent-card.json
+        status: 401
+        type: application/json
+        note: Not an agent card — the console returns an auth challenge.
+      - path: /.well-known/agent.json
+        status: 401
+        type: application/json
+        note: Not an agent card — the console returns an auth challenge.
+summary:
+  hosts_probed: 4
+  real_documents_found: 2
+  security_txt: false
+  agent_card: false
+  api_catalog: false
+  ai_plugin: false

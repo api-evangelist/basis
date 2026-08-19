@@ -1,0 +1,98 @@
+generated: '2026-08-13'
+method: derived
+format: basis-message-object
+source: >-
+  Derived from the 4xx response schemas of all 31 operations in
+  openapi/basis-analytics-api-openapi.yml, enriched with the error behaviour
+  documented in the Basis Platform API description
+  (https://api.basis.net/swagger.json) and with live unauthenticated probes of
+  https://api.basis.net on 2026-08-13.
+description: >-
+  The Basis Platform API does NOT use RFC 9457 application/problem+json. Every
+  error is a plain JSON object whose only guaranteed member is `message`.
+  Framework-level routing and validation errors add `error` and `statusCode`.
+rfc9457: false
+envelope:
+  media_type: application/json
+  shape: '{ "message": string, "error": string?, "statusCode": integer? }'
+  guaranteed_fields: [message]
+  observed_extra_fields: [error, statusCode]
+  error_code_field: null
+  note: >-
+    There is no machine-readable error code. Clients must branch on HTTP status,
+    and where finer granularity is needed, parse the human-readable `message`.
+    This is the weakest point in the API's agent-readiness posture.
+coverage:
+  operations: 31
+  with_400: 30
+  with_401: 31
+  with_404: 16
+  with_429: 0
+  with_5xx: 0
+  note: >-
+    429 is documented in prose (rate limits and client-credentials token quota)
+    but is not declared on any operation in the specification. No 5xx response is
+    declared anywhere.
+problems:
+  - status: 400
+    title: Bad Request
+    meaning: >-
+      A path or query parameter failed schema validation — most commonly an
+      identifier that does not match the pattern the endpoint requires.
+    envelope_example: '{"message":"params/id must match pattern \"^[0-9a-fA-F]{8}-...\""}'
+    evidence: >-
+      probed https://api.basis.net/v1/brands/xyz on 2026-08-13 → HTTP 400
+    remediation: >-
+      Read the echoed pattern. Identifier formats differ by resource — UUID v4 for
+      most objects, numeric for verticals and KPIs, 40-character alphanumeric for
+      creatives. See conventions/basis-conventions.yml#identifiers.
+    declared_on: 30 of 31 operations
+  - status: 401
+    title: Unauthorized
+    meaning: No access token was presented, or the token is invalid or expired.
+    envelope_example: '{"message":"missing authorization header"}'
+    evidence: probed https://api.basis.net/v1/me on 2026-08-13 → HTTP 401
+    remediation: >-
+      Obtain a token from https://auth.basis.net/oauth/token with audience
+      https://api.basis.net and send it as `Authorization: Bearer <token>`. A 401
+      from the TOKEN endpoint under client_credentials means the application has
+      no associated owner (agency) ID — contact Basis support.
+    declared_on: all 31 operations
+  - status: 404
+    title: Not Found
+    meaning: >-
+      The requested resource does not exist, is not visible to the credential, or
+      the route itself does not exist.
+    envelope_example: '{"message":"Route GET:/v1/nope not found","error":"Not Found","statusCode":404}'
+    evidence: probed https://api.basis.net/v1/nope on 2026-08-13 → HTTP 404
+    remediation: >-
+      Distinguish the two cases by the presence of `error`/`statusCode`: a routing
+      404 carries them, a resource 404 carries only `message`. Note that
+      user-scoped endpoints (GET /v1/me and other user-information endpoints)
+      return 404 — not 401 — when called with a client_credentials token, because
+      that token represents an organization rather than a user.
+    declared_on: 16 of 31 operations
+  - status: 429
+    title: Too Many Requests
+    meaning: >-
+      Either the 75,000 requests/hour per-API-user ceiling, or the
+      client-credentials token quota (10/hour, 25/day) at the token endpoint.
+    declared_in_spec: false
+    evidence: >-
+      Basis Platform API description, "API Request Limits" and "Client Credentials
+      Token Quota" sections.
+    remediation: >-
+      On a 429 from https://auth.basis.net/oauth/token, inspect the Auth0 token
+      quota headers on the response; Basis points at
+      https://auth0.com/docs/fine-grained-m2m-token-quotas-early-access. Reuse
+      access tokens rather than minting a new one per request. Contact Basis
+      support to raise the limit.
+gaps:
+  - No stable, machine-readable error code — only HTTP status plus a prose message.
+  - No 429 or 5xx responses declared on any operation.
+  - No retry-after or rate-limit headers documented on the data API.
+  - No error reference page published outside the OpenAPI description.
+related:
+  - conventions/basis-conventions.yml
+  - rate-limits/basis-rate-limits.yml
+  - authentication/basis-authentication.yml

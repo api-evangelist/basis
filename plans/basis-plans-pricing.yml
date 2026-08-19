@@ -1,8 +1,24 @@
 name: Basis Plans & Pricing
 description: Basis does not publish pricing publicly. The platform operates on a custom enterprise pricing model based on agency size, ad spend volume, and required channels. Pricing is negotiated directly with the Basis sales team.
 url: https://basis.com/technology/enterprise-api
+generated: '2026-08-13'
+method: searched
+source: >-
+  https://basis.com/technology/enterprise-api and https://basis.com/connect
+  (probed 2026-08-13, both HTTP 200). Neither page — nor any page in
+  https://basis.com/page-sitemap.xml — states a price, a tier, a quota or an
+  overage rate. There is no pricing page and no /pricing URL on basis.com.
 created: '2026-06-13'
-modified: '2026-06-13'
+modified: '2026-08-13'
+published_pricing: false
+plan_count: 0
+plan_count_note: >-
+  Zero is the honest count. Basis publishes NO priced plan or tier of any kind —
+  the only route to a number is "Connect With Us", a contact-sales form. The
+  single entry below describes the one commercial arrangement Basis offers; it is
+  a contact-sales enterprise agreement, not a published plan, so it is not counted
+  as one. Every figure in its notes is third-party or industry-range context and
+  is labelled as such — none of it is published by Basis.
 plans:
   - name: Enterprise DSP
     description: Full access to the Basis DSP and omnichannel advertising platform including programmatic, search, social, connected TV, and direct site advertising. Pricing is custom-quoted based on media spend volume and platform scope.

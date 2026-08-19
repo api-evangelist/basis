@@ -1,0 +1,83 @@
+generated: '2026-08-13'
+method: searched
+source: >-
+  https://api.basis.net/swagger.json (the Basis Platform API's own description),
+  https://basis.com/technology/enterprise-api, and probes of
+  status.basis.com / status.basis.net (2026-08-13). Deprecated items derived from
+  the specification text and from openapi/basis-analytics-api-openapi.yml.
+description: >-
+  Lifecycle posture of the Basis Platform API. Basis versions in the URI path and
+  is on v1. It publishes no changelog, no status page, no SLA, and no deprecation
+  policy; the one deprecation it does announce (the OAuth password grant) is
+  stated in prose inside the API description with no sunset date.
+versioning:
+  scheme: uri-path
+  current: v1
+  mechanism: 'https://api.basis.net/v1/...'
+  header: null
+  evidence: >-
+    "The current version of the API is v1." — Basis Platform API description.
+    Every one of the 31 published paths is prefixed /v1/.
+  notes: >-
+    No version-negotiation header, no date-pinned versions, and no published
+    policy for how a v2 would be introduced or how long v1 would be supported.
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  deprecated_operations: []
+  deprecated_features:
+    - name: OAuth 2.0 password grant
+      status: deprecated
+      announced_in: https://api.basis.net/swagger.json
+      sunset_date: null
+      evidence: >-
+        "The password grant flow has now been deprecated. Please update your
+        applications to use one of the above two flows."
+      migration: >-
+        Move to the authorization-code flow (interactive, returns a refresh
+        token) or the client-credentials flow (machine-to-machine, requires an
+        owner/agency ID).
+  notes: >-
+    No RFC 8594 Sunset or Deprecation headers are documented, no operation in the
+    specification carries `deprecated: true`, and no timetable is attached to the
+    password-grant deprecation.
+changelog:
+  url: null
+  published: false
+  note: >-
+    No dated changelog or release-notes page was found for the Basis Platform
+    API. The specification's info.version is the bare string "v1" and carries no
+    build or revision marker, so a consumer cannot tell when it last changed.
+status_page:
+  url: null
+  published: false
+  evidence:
+    - {url: 'https://status.basis.com', result: DNS NXDOMAIN}
+    - {url: 'https://status.basis.net', result: DNS NXDOMAIN}
+  health_endpoint:
+    url: https://api.basis.net/health
+    status: 200
+    body: '{"extended_health_check":true,"db_connection":true}'
+    note: >-
+      An unauthenticated liveness endpoint exists and answers publicly, but it is
+      undocumented and is not a status page — it reports no history, no incidents,
+      and no component breakdown.
+sla:
+  url: null
+  public_uptime_target: null
+  note: >-
+    Basis publishes no uptime commitment. Availability terms are handled inside
+    the enterprise agreement negotiated with sales (https://basis.com/connect).
+support:
+  channel: https://basis.com/connect
+  note: >-
+    Credentials, redirect-URI registration, owner/agency-ID assignment and
+    rate-limit increases are all handled by a Basis representative rather than
+    self-serve.
+related:
+  - conventions/basis-conventions.yml
+  - rate-limits/basis-rate-limits.yml
+  - authentication/basis-authentication.yml

@@ -1,0 +1,155 @@
+generated: '2026-08-13'
+method: searched
+source: >-
+  https://api.basis.net/swagger.json — the cross-cutting request/response
+  conventions documented in the Basis Platform API's own info.description and
+  confirmed against its parameter/response schemas in
+  openapi/basis-analytics-api-openapi.yml, plus live unauthenticated probes of
+  https://api.basis.net (2026-08-13).
+description: >-
+  How the Basis Platform API behaves across every operation: authentication
+  style, pagination, filtering, versioning, the error envelope, and rate-limit
+  signaling. The current v1 surface is read-only — all 31 published operations are
+  GET — so several write-side conventions (idempotency, request bodies, conflict
+  semantics) have no published contract.
+base_url: https://api.basis.net
+base_path: /v1
+api_style: >-
+  REST over HTTPS. JSON responses. Basis documents the verb mapping read=GET,
+  create=POST, update=PUT, delete=DELETE, but only GET operations are present in
+  the published specification.
+
+authentication:
+  scheme: OAuth 2.0 bearer token (Authorization header)
+  authorization_server: https://auth.basis.net
+  audience: https://api.basis.net
+  self_serve: false
+  detail: authentication/basis-authentication.yml
+
+idempotency:
+  supported: false
+  mechanism: null
+  note: >-
+    Basis publishes no idempotency key, header, or replay contract. No
+    Idempotency-Key parameter appears anywhere in the specification. The
+    published v1 surface is entirely GET, which is inherently idempotent, so the
+    question does not arise for the operations that exist today — but any future
+    write surface has no documented idempotency contract.
+
+pagination:
+  style: cursor
+  request_params:
+    cursor: >-
+      Opaque string. Omit for the first page, then pass the value from
+      metadata.cursor to fetch the next page.
+  response_fields:
+    metadata.cursor: >-
+      string or null — "Use this cursor value in your next call to this endpoint
+      to return the next set of items". null/absent indicates the last page.
+    metadata.page_size: integer — number of items in this page.
+    metadata.total: integer — total number of matching items.
+    data: array of results.
+  page_size_param: null
+  note: >-
+    Page size is not client-controllable — no limit/per_page parameter is
+    published. `cursor` appears on 15 of the 31 operations (every list endpoint).
+
+filtering:
+  free_text:
+    param: query
+    note: >-
+      "Used to refine the results by a chosen parameter." The valid parameter set
+      is per-endpoint and stated in each parameter description (commonly `name`).
+    operations: 11
+  by_relationship:
+    params: [client_id, brand_id, campaign_id, line_item_id, line_item_lineage_id]
+    note: UUID-v4-shaped foreign keys, pattern-validated server-side.
+  by_status:
+    param: status
+    values: [live, approved, completed]
+    scope: campaigns
+  by_date:
+    params: [start_date, end_date]
+    format: 'YYYY-MM-DD (pattern ^\d{4}-\d{2}-\d{2}$)'
+    scope: /v1/stats/{scope}
+
+response_envelope:
+  media_type: application/json
+  list: '{ "metadata": { "cursor", "page_size", "total" }, "data": [ ... ] }'
+  single: '{ "data": { ... } }'
+
+identifiers:
+  primary: >-
+    UUID v4 — pattern
+    ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
+    on brands, clients, campaigns, line items, add-ons, groups, tactics,
+    conversions, delivery sources.
+  exceptions:
+    - {resource: verticals, format: 'numeric string (^[0-9]+$)'}
+    - {resource: kpis, format: 'numeric string (^[0-9]+$)'}
+    - {resource: creatives, format: '40-character alphanumeric (^[a-zA-Z0-9]{40}$)'}
+    - {resource: properties, format: unconstrained string}
+  note: >-
+    Identifier format is NOT uniform across the API. An agent must not assume a
+    UUID for every {id} path parameter — a mismatch is rejected with a 400 that
+    echoes the expected regex.
+
+field_expansion:
+  supported: false
+  note: >-
+    No expand[]-style parameter. Related objects are returned either inline
+    (verticals nested inside brands) or as bare id fields the client must follow
+    with a second call.
+
+metadata:
+  user_defined: false
+  note: >-
+    `metadata` in a Basis response is the pagination envelope, not a
+    customer-writable key/value bag.
+
+request_tracing:
+  request_id_header: null
+  note: >-
+    No request-id or correlation-id header is documented, and none was observed
+    on live 200/401/404 responses from https://api.basis.net on 2026-08-13.
+    Responses carry only date, content-type, content-length and server.
+
+versioning:
+  scheme: URI path
+  current: v1
+  mechanism: 'https://api.basis.net/v1/...'
+  header: null
+  detail: lifecycle/basis-lifecycle.yml
+
+error_envelope:
+  media_type: application/json
+  shape: '{ "message": string, "error": string?, "statusCode": integer? }'
+  note: >-
+    Not RFC 9457. The specification declares only `{ "message": string }` for
+    400/401/404; live probes return an extended form with `error` and
+    `statusCode` on routing errors.
+  detail: errors/basis-problem-types.yml
+
+rate_limits:
+  published: true
+  headline: 75,000 requests per hour across all endpoints, per API user
+  token_issuance: 10 client-credentials tokens per hour, 25 per day
+  exhausted_status: 429
+  response_headers: null
+  note: >-
+    Basis publishes the numbers but documents no RateLimit-*/X-RateLimit-*
+    response headers for the data API; for token-quota exhaustion it points at
+    the Auth0 token-quota headers on the 429 from the token endpoint.
+  detail: rate-limits/basis-rate-limits.yml
+
+sandbox:
+  base_url: https://api-sandbox.basis.net/v1
+  detail: sandbox/basis-sandbox.yml
+
+related:
+  - authentication/basis-authentication.yml
+  - scopes/basis-scopes.yml
+  - errors/basis-problem-types.yml
+  - lifecycle/basis-lifecycle.yml
+  - rate-limits/basis-rate-limits.yml
+  - data-model/basis-data-model.yml

@@ -1,0 +1,84 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Basis Analytics API
+  version: 1.0.0
+extends: openapi/basis-analytics-api-openapi.yml
+generated: '2026-08-13'
+method: generated
+source: openapi/basis-analytics-api-openapi.yml
+actions:
+  - target: $.info
+    update:
+      x-apievangelist:
+        catalog: https://apis.io/basis
+        provider: Basis
+        maintainer: Kin Lane <kin@apievangelist.com>
+        contract_source: https://api.basis.net/swagger.json
+        artifacts:
+          - apis.yml
+          - authentication/basis-authentication.yml
+          - scopes/basis-scopes.yml
+          - conventions/basis-conventions.yml
+          - errors/basis-problem-types.yml
+          - lifecycle/basis-lifecycle.yml
+          - conformance/basis-conformance.yml
+          - data-model/basis-data-model.yml
+          - rate-limits/basis-rate-limits.yml
+          - sandbox/basis-sandbox.yml
+          - well-known/basis-well-known.yml
+          - mcp/basis-mcp.yml
+          - skills/_index.yml
+          - agentic-access/basis-agentic-access.yml
+          - vocabulary/basis-vocabulary.json
+          - rules/basis-jsonschema-spectral-rules.yml
+  - target: $.servers
+    update:
+      - url: https://api.basis.net
+        description: Production
+      - url: https://api-sandbox.basis.net
+        description: >-
+          Sandbox, documented in the API description. Did not resolve from a
+          public DNS resolver on 2026-08-13 — see sandbox/basis-sandbox.yml.
+  - target: $.info
+    update:
+      x-conventions:
+        pagination:
+          style: cursor
+          request_param: cursor
+          response_fields: [metadata.cursor, metadata.page_size, metadata.total]
+        idempotency:
+          supported: false
+        versioning:
+          scheme: uri-path
+          current: v1
+        error_envelope: '{ "message": string, "error": string?, "statusCode": integer? }'
+        rfc9457: false
+      x-rate-limits:
+        requests_per_hour: 75000
+        scope: per-api-user
+        exhausted_status: 429
+        response_headers: null
+        source: info.description, "API Request Limits"
+      x-authentication:
+        type: oauth2
+        authorization_server: https://auth.basis.net
+        authorization_endpoint: https://auth.basis.net/authorize
+        token_endpoint: https://auth.basis.net/oauth/token
+        audience: https://api.basis.net
+        grants: [authorization_code, client_credentials, refresh_token]
+        deprecated_grants: [password]
+        scopes: [openid, profile, email, offline_access]
+        self_serve: false
+      x-gaps:
+        note: >-
+          Observations from the published contract, recorded for the provider's
+          benefit. The original specification is never mutated by this pipeline.
+        findings:
+          - No operationId on any of the 31 operations.
+          - Only one tag ("Analytics") across the whole surface.
+          - No components.schemas — every schema is inlined and duplicated.
+          - No response examples anywhere in the specification.
+          - The OAuth2 securityScheme is declared with no flows object, so scopes and endpoints are undiscoverable from the contract.
+          - 429 is documented in prose but declared on zero operations; no 5xx is declared.
+          - No info.contact, info.license or info.termsOfService.
+          - info.version is the bare string "v1" with no revision marker, so a consumer cannot detect change.

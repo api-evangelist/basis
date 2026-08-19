@@ -1,0 +1,267 @@
+generated: '2026-08-13'
+method: derived
+status: candidate
+source: >-
+  Derived from openapi/basis-analytics-api-openapi.yml. Basis publishes NO MCP
+  server. Searched the Basis site and developer surface and probed
+  https://api.basis.net/mcp (404), https://basis.com/mcp (404),
+  https://mcp.basis.net (DNS NXDOMAIN) and https://mcp.basis.com (DNS NXDOMAIN)
+  on 2026-08-13. The tool list below is an API Evangelist candidate mapping of the
+  provider's own REST operations, not a server Basis operates.
+description: >-
+  Candidate MCP tool surface for the Basis Platform API. All 31 published
+  operations are GET, so a faithful MCP server for this API is entirely read-only:
+  an agent can plan-and-report against Basis campaign, delivery and performance
+  data, but cannot create or change anything through the public v1 contract.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: oauth
+  verified: derived
+  note: >-
+    mode is `none` because no MCP server exists — neither a remote endpoint nor a
+    stdio package. Any implementation would inherit the API's OAuth 2.0
+    requirement (authorization server https://auth.basis.net, audience
+    https://api.basis.net) and would need credentials issued by a Basis
+    representative; there is no self-serve path.
+auth:
+  scheme: oauth2
+  authorization_server: https://auth.basis.net
+  audience: https://api.basis.net
+  detail: authentication/basis-authentication.yml
+probes:
+  - {url: 'https://api.basis.net/mcp', method: 'POST tools/list', status: 404, checked: '2026-08-13'}
+  - {url: 'https://basis.com/mcp', method: 'POST tools/list', status: 404, checked: '2026-08-13'}
+  - {url: 'https://mcp.basis.net/mcp', method: 'POST tools/list', status: null, result: 'DNS NXDOMAIN', checked: '2026-08-13'}
+  - {url: 'https://mcp.basis.com/mcp', method: 'POST tools/list', status: null, result: 'DNS NXDOMAIN', checked: '2026-08-13'}
+  - {url: 'https://platform.basis.net/mcp', method: 'GET', status: 200, result: 'HTML SPA shell, not an MCP endpoint', checked: '2026-08-13'}
+tool_count: 31
+tools:
+  - name: basis_get_me
+    description: >-
+      Returns the currently authenticated user
+    rest: 'GET /v1/me'
+    inputs: []
+  - name: basis_get_agency
+    description: >-
+      Returns details for the agency, the organization representing a buyer.
+    rest: 'GET /v1/agency'
+    inputs: []
+  - name: basis_get_brands_by_id
+    description: >-
+      Returns details for one brand.
+    rest: 'GET /v1/brands/{id}'
+    inputs:
+      - {name: id, in: path, required: true}
+  - name: basis_get_brands
+    description: >-
+      Lists all brands.
+    rest: 'GET /v1/brands'
+    inputs:
+      - {name: cursor, in: query, required: false}
+      - {name: query, in: query, required: false}
+      - {name: client_id, in: query, required: false}
+  - name: basis_get_clients_by_id
+    description: >-
+      Returns details for one client. An agency can represent multiple clients, and each client can have multiple brands.
+    rest: 'GET /v1/clients/{id}'
+    inputs:
+      - {name: id, in: path, required: true}
+  - name: basis_get_clients
+    description: >-
+      Lists all clients.
+    rest: 'GET /v1/clients'
+    inputs:
+      - {name: cursor, in: query, required: false}
+      - {name: query, in: query, required: false}
+  - name: basis_get_vendors_by_id
+    description: >-
+      Returns details for one vendor, an entity or organization selling and offering products, content, or services for payment. Examples of vendors would include the owners of websites that offer advertisement space and exchanges that offers ad space on multiple websites.
+    rest: 'GET /v1/vendors/{id}'
+    inputs:
+      - {name: id, in: path, required: true}
+  - name: basis_get_vendors
+    description: >-
+      Lists all vendors, entities or organizations selling and offering products, content, or services for payment. Examples of vendors would include the owners of websites that offer advertisement space and exchanges that offers ad space on multiple websites.
+    rest: 'GET /v1/vendors'
+    inputs:
+      - {name: cursor, in: query, required: false}
+      - {name: query, in: query, required: false}
+      - {name: campaign_id, in: query, required: false}
+  - name: basis_get_properties_by_id
+    description: >-
+      Returns details for one property--inventory (advertising space) available for sale, often a website or network.
+    rest: 'GET /v1/properties/{id}'
+    inputs:
+      - {name: id, in: path, required: true}
+  - name: basis_get_properties
+    description: >-
+      Lists all properties, inventory (advertising space) available for sale, often websites or networks.
+    rest: 'GET /v1/properties'
+    inputs:
+      - {name: cursor, in: query, required: false}
+      - {name: query, in: query, required: false}
+      - {name: campaign_id, in: query, required: false}
+  - name: basis_get_campaigns_by_id
+    description: >-
+      Returns details for a single campaign.
+    rest: 'GET /v1/campaigns/{id}'
+    inputs:
+      - {name: id, in: path, required: true}
+  - name: basis_get_campaigns
+    description: >-
+      Lists all campaigns.
+    rest: 'GET /v1/campaigns'
+    inputs:
+      - {name: cursor, in: query, required: false}
+      - {name: query, in: query, required: false}
+      - {name: client_id, in: query, required: false}
+      - {name: status, in: query, required: false}
+  - name: basis_get_campaigns_by_campaign_id_line_items_by_id
+    description: >-
+      Returns details for a single line item.
+    rest: 'GET /v1/campaigns/{campaign_id}/line_items/{id}'
+    inputs:
+      - {name: campaign_id, in: path, required: true}
+      - {name: id, in: path, required: true}
+  - name: basis_get_campaigns_by_campaign_id_line_items
+    description: >-
+      Lists all line items for one campaign.
+    rest: 'GET /v1/campaigns/{campaign_id}/line_items'
+    inputs:
+      - {name: cursor, in: query, required: false}
+      - {name: query, in: query, required: false}
+      - {name: campaign_id, in: path, required: true}
+  - name: basis_get_campaigns_by_campaign_id_addons_by_id
+    description: >-
+      Returns details for a single add-on. An add-on is a fee for a service that is billed outside of the campaign's line items.
+    rest: 'GET /v1/campaigns/{campaign_id}/addons/{id}'
+    inputs:
+      - {name: campaign_id, in: path, required: true}
+      - {name: id, in: path, required: true}
+  - name: basis_get_campaigns_by_campaign_id_addons
+    description: >-
+      Lists add-ons for a single campaign. An add-on is a fee for an additional service that is billed outside of line items.
+    rest: 'GET /v1/campaigns/{campaign_id}/addons'
+    inputs:
+      - {name: cursor, in: query, required: false}
+      - {name: query, in: query, required: false}
+      - {name: campaign_id, in: path, required: true}
+  - name: basis_get_verticals_by_id
+    description: >-
+      Returns details for a single vertical, the market or category type for a vendor, property, or brand.
+    rest: 'GET /v1/verticals/{id}'
+    inputs:
+      - {name: id, in: path, required: true}
+  - name: basis_get_verticals
+    description: >-
+      Lists all verticals, the market or category types for a vendor, property, or brand.
+    rest: 'GET /v1/verticals'
+    inputs:
+      - {name: cursor, in: query, required: false}
+      - {name: query, in: query, required: false}
+  - name: basis_get_kpis_by_id
+    description: >-
+      Returns details for a single Key Performance Indicator (KPI).
+    rest: 'GET /v1/kpis/{id}'
+    inputs:
+      - {name: id, in: path, required: true}
+  - name: basis_get_kpis
+    description: >-
+      Lists all Key Performance Indicators (KPI)
+    rest: 'GET /v1/kpis'
+    inputs:
+      - {name: cursor, in: query, required: false}
+      - {name: query, in: query, required: false}
+  - name: basis_get_creatives_by_id
+    description: >-
+      Returns details for a single creative.
+    rest: 'GET /v1/creatives/{id}'
+    inputs:
+      - {name: id, in: path, required: true}
+  - name: basis_get_creatives
+    description: >-
+      Lists all creatives.
+    rest: 'GET /v1/creatives'
+    inputs:
+      - {name: cursor, in: query, required: false}
+  - name: basis_get_delivery_sources_by_id
+    description: >-
+      Returns details for one delivery source.
+    rest: 'GET /v1/delivery_sources/{id}'
+    inputs:
+      - {name: id, in: path, required: true}
+  - name: basis_get_delivery_sources
+    description: >-
+      Lists all delivery sources, which provide delivery data used for statistics.
+    rest: 'GET /v1/delivery_sources'
+    inputs:
+      - {name: cursor, in: query, required: false}
+  - name: basis_get_conversions_by_id
+    description: >-
+      Returns details for a single conversion.
+    rest: 'GET /v1/conversions/{id}'
+    inputs:
+      - {name: id, in: path, required: true}
+  - name: basis_get_conversions
+    description: >-
+      Lists all conversions.
+    rest: 'GET /v1/conversions'
+    inputs:
+      - {name: cursor, in: query, required: false}
+  - name: basis_get_groups_by_id
+    description: >-
+      Returns details for a single Group.
+    rest: 'GET /v1/groups/{id}'
+    inputs:
+      - {name: id, in: path, required: true}
+  - name: basis_get_groups
+    description: >-
+      Lists all Groups.
+    rest: 'GET /v1/groups'
+    inputs:
+      - {name: cursor, in: query, required: false}
+      - {name: query, in: query, required: false}
+  - name: basis_get_tactics_by_id
+    description: >-
+      Returns details for a single Tactic.
+    rest: 'GET /v1/tactics/{id}'
+    inputs:
+      - {name: id, in: path, required: true}
+  - name: basis_get_tactics
+    description: >-
+      Lists all Tactics.
+    rest: 'GET /v1/tactics'
+    inputs:
+      - {name: cursor, in: query, required: false}
+      - {name: query, in: query, required: false}
+  - name: basis_get_stats_by_scope
+    description: >-
+      Retrieves statistics.
+    rest: 'GET /v1/stats/{scope}'
+    inputs:
+      - {name: cursor, in: query, required: false}
+      - {name: brand_id, in: query, required: false}
+      - {name: client_id, in: query, required: false}
+      - {name: campaign_id, in: query, required: false}
+      - {name: line_item_id, in: query, required: false}
+      - {name: line_item_lineage_id, in: query, required: false}
+      - {name: start_date, in: query, required: false}
+      - {name: end_date, in: query, required: false}
+      - {name: scope, in: path, required: true}
+notes:
+  - >-
+    Every tool inherits its real inputSchema from the backing OpenAPI operation's
+    parameters. The specification declares no operationIds, so tools are bound by
+    method + path.
+  - >-
+    Cursor pagination applies to every list tool — pass `cursor` from
+    metadata.cursor to page. See conventions/basis-conventions.yml.
+  - >-
+    basis_get_me returns 404 rather than a user under a client-credentials token.
+related:
+  - openapi/basis-analytics-api-openapi.yml
+  - conventions/basis-conventions.yml
+  - agentic-access/basis-agentic-access.yml

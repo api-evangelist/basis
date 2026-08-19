@@ -1,0 +1,64 @@
+generated: '2026-08-13'
+method: searched
+source: >-
+  https://auth.basis.net/.well-known/openid-configuration (probed 2026-08-13,
+  HTTP 200) and the Authentication section of the Basis Platform API description
+  published at https://api.basis.net/swagger.json.
+docs: https://api.basis.net/swagger.json
+description: >-
+  The Basis Platform API delegates authorization to an OpenID Connect provider at
+  https://auth.basis.net (Auth0). The API's own OpenAPI declares a securityScheme
+  named `OAuth2` with no flows object and therefore no scopes, so the scope
+  surface below is taken from the authorization server's published discovery
+  document and from the authorize-URL example in the Basis documentation. These
+  are OIDC identity scopes plus `offline_access`; Basis publishes no
+  resource-level (read/write per-object) scopes for the Analytics API — access is
+  scoped by the credential's owner (agency) and by client-credentials audience,
+  not by scope strings.
+authorization_server:
+  issuer: https://auth.basis.net/
+  authorization_endpoint: https://auth.basis.net/authorize
+  token_endpoint: https://auth.basis.net/oauth/token
+  jwks_uri: https://auth.basis.net/.well-known/jwks.json
+  revocation_endpoint: https://auth.basis.net/oauth/revoke
+  audience: https://api.basis.net
+  discovery: well-known/basis-openid-configuration.json
+documented_request_scopes:
+  source: >-
+    Verbatim from the Basis authorize-URL example — "scope=openid profile email
+    offline_access".
+  scopes:
+    - name: openid
+      description: Required to obtain an ID token from the OpenID Connect provider.
+    - name: profile
+      description: Basic profile claims (name, given_name, family_name, nickname, picture).
+    - name: email
+      description: Email address and email_verified claim.
+    - name: offline_access
+      description: >-
+        Required to receive a refresh token. Basis notes that only the
+        authorization-code flow returns a refresh token.
+supported_scopes:
+  source: scopes_supported in the authorization server discovery document
+  scopes:
+    - openid
+    - profile
+    - offline_access
+    - name
+    - given_name
+    - family_name
+    - nickname
+    - email
+    - email_verified
+    - picture
+    - created_at
+    - identities
+    - phone
+    - address
+resource_scopes:
+  published: false
+  note: >-
+    No per-resource or per-operation scopes are published for the Analytics API.
+    Every operation in openapi/basis-analytics-api-openapi.yml declares
+    `security: [{Bearer: [], OAuth2: []}]` with an empty scope array.
+scope_count: 4

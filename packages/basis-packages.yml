@@ -1,0 +1,38 @@
+generated: '2026-08-13'
+method: searched
+source: >-
+  Searched npm (registry.npmjs.org search), PyPI, and GitHub organization
+  lookups for a first-party Basis client library, plus the Basis Enterprise API
+  page (https://basis.com/technology/enterprise-api) and the API's own
+  documentation embedded in https://api.basis.net/swagger.json. No first-party
+  SDK, client library, or CLI is published by Basis in any public registry, and
+  the API documentation contains only raw `curl` examples.
+description: >-
+  Basis publishes no first-party client libraries. Integration with the Basis
+  Platform API is over plain HTTPS with an OAuth 2.0 bearer token; the vendor's
+  own documentation demonstrates every flow with `curl` and nothing else.
+package_count: 0
+official_package_count: 0
+packages: []
+searched:
+  - registry: npm
+    query: 'registry.npmjs.org/-/v1/search?text=basis.net'
+    result: no first-party package (only unrelated `basis-library` / `@basis-theory/*`)
+  - registry: pypi
+    queried: [basis-api, basisplatform, basis-platform, basis-net, centro-api]
+    result: all 404
+  - registry: github
+    queried: [basis-technologies, basistechnologies, basisglobal, basis-net, centro-api, CentroInc]
+    result: >-
+      No Basis (basis.com) organization exists. `basistechnologies` is BASIS
+      Technologies Private Limited of India (basistech.in) and `CentroInc` is
+      Centro Inc. Custom Rotational Molders — neither is this company, so neither
+      was recorded.
+notes:
+  - >-
+    Namespace collision warning for future rounds: "Basis" is a heavily reused
+    name. `@basis-theory/*` on npm belongs to Basis Theory (payments tokenization),
+    not Basis the advertising platform. Do not record those as first-party.
+  - >-
+    Because no package exists, there is no registry version or publish date to
+    record; the SDK-decay signal is unavailable for this provider.

@@ -1,29 +1,107 @@
 name: Basis API Rate Limits
-description: Basis API rate limit details are not publicly documented. The API includes time-sensitive limits noted by third-party integration partners. Rate limits are enforced on the Basis Platform API (api.basis.net) which uses OAuth 2.0 authentication.
-url: https://basis.com/technology/enterprise-api
+description: >-
+  Basis publishes its API rate limits inside the Basis Platform API's own
+  OpenAPI description at https://api.basis.net/swagger.json — a hard ceiling of
+  75,000 requests per hour per API user across all endpoints, plus a separate
+  quota on OAuth client-credentials token issuance. It publishes no
+  RateLimit-*/X-RateLimit-* response headers for the data API. Third-party
+  integration partners additionally report historical-data cutoffs, recorded
+  below with their source attributed.
+url: https://api.basis.net/swagger.json
+generated: '2026-08-13'
+method: searched
+source: https://api.basis.net/swagger.json
 created: '2026-06-13'
-modified: '2026-06-13'
+modified: '2026-08-13'
+limit_count: 3
+exhausted_status: 429
+response_headers:
+  data_api: null
+  token_endpoint:
+    note: >-
+      Basis directs callers to the Auth0 fine-grained M2M token-quota headers on a
+      429 from https://auth.basis.net/oauth/token —
+      https://auth0.com/docs/fine-grained-m2m-token-quotas-early-access
+  note: >-
+    No RateLimit-Limit / RateLimit-Remaining / RateLimit-Reset / X-RateLimit-* /
+    Retry-After header is documented for https://api.basis.net, and none was
+    observed on live 200/401/404 responses probed on 2026-08-13 (responses carry
+    only date, content-type, content-length, server).
 rateLimits:
+  - name: Requests per API user
+    description: >-
+      "Basis balances transaction loads by imposing rate limits of 75,000 requests
+      per hour across all endpoints per API user."
+    scope: per-api-user
+    window: 1 hour
+    limit: 75000
+    burst: null
+    applies_to: all endpoints
+    exhausted_status: 429
+    source: https://api.basis.net/swagger.json
+    method: searched
+  - name: Client-credentials token issuance (hourly)
+    description: >-
+      "Client credentials token generation is limited to 10 per hour."
+    scope: per-application
+    window: 1 hour
+    limit: 10
+    endpoint: https://auth.basis.net/oauth/token
+    exhausted_status: 429
+    source: https://api.basis.net/swagger.json
+    method: searched
+    remediation: >-
+      Cache and reuse access tokens rather than minting one per request. Contact
+      Basis Support to raise the limit.
+  - name: Client-credentials token issuance (daily)
+    description: >-
+      "…with a maximum of 25 per day."
+    scope: per-application
+    window: 1 day
+    limit: 25
+    endpoint: https://auth.basis.net/oauth/token
+    exhausted_status: 429
+    source: https://api.basis.net/swagger.json
+    method: searched
+dataRetrievalLimitsNote: >-
+  Not rate limits — retrieval-window constraints reported by third-party
+  integration vendors, not by Basis. Retained from the 2026-06-13 round with the
+  source attributed; treat as unconfirmed by the provider.
+dataRetrievalLimits:
   - name: Historical Data Cutoffs
-    description: Time-sensitive limits on historical data retrieval enforced by the Basis API. These limits make it impossible to pull historical data after specific cut-off dates.
+    description: >-
+      Time-sensitive limits on historical data retrieval that make it impossible
+      to pull historical data after specific cut-off dates.
     scope: data-retrieval
     limits:
       - dimension: Country, City, Region metrics
         historicalLookback: 90 days
-        notes: Data older than 90 days is unavailable for geographic dimensions
       - dimension: Campaigns, Ads, Audience, Device, OS metrics
         historicalLookback: 180 days
-        notes: Data older than 180 days is unavailable for campaign and audience dimensions
-    source: AgencyAnalytics integration documentation
+    source: AgencyAnalytics integration documentation (third party)
+    method: searched
   - name: Data Sync Frequency
-    description: The API supports hourly synchronization with 15-minute refresh cycles available through integration partners.
+    description: >-
+      Hourly synchronization with 15-minute refresh cycles available through
+      integration partners.
     scope: data-sync
     syncFrequency: hourly
     refreshCycle: 15 minutes
-    source: Improvado integration documentation
+    source: Improvado integration documentation (third party)
+    method: searched
 notes:
-  - Basis does not publicly document specific API rate limits (requests per minute/hour)
-  - Rate limits are enforced but not disclosed in public-facing documentation
-  - Contact Basis directly at basis.com/connect for official rate limit specifications
-  - OAuth 2.0 authentication is required; Client ID, Client Secret, and Advertiser ID are needed
-  - API base URL is https://api.basis.net
+  - >-
+    The 75,000/hour figure is provider-published and authoritative; it supersedes
+    the earlier note in this file that Basis does not publicly document rate
+    limits. It is published inside the OpenAPI description rather than on a
+    developer-portal page, which is why it was missed in the first round.
+  - >-
+    429 is documented in prose but declared on zero of the 31 operations in the
+    specification — a client cannot discover it from the machine-readable contract.
+  - >-
+    OAuth 2.0 authentication is required; credentials are issued by a Basis
+    representative, not self-serve.
+related:
+  - conventions/basis-conventions.yml
+  - errors/basis-problem-types.yml
+  - authentication/basis-authentication.yml

@@ -1,0 +1,46 @@
+generated: '2026-08-13'
+method: generated
+source: >-
+  Packaged Agent Skills generated from the Basis Platform API contract
+  (openapi/basis-analytics-api-openapi.yml, harvested verbatim from
+  https://api.basis.net/swagger.json) plus conventions/, errors/,
+  rate-limits/, authentication/ and data-model/ in this repo. Basis publishes no
+  skills or AGENTS.md of its own.
+note: >-
+  The Basis specification declares NO operationIds on any of its 31 operations, so
+  every skill identifies operations by HTTP method + path, verified verbatim
+  against the specification. No operation name in these skills is invented.
+skills:
+  - file: basis-authenticate-and-read.md
+    name: Authenticate against the Basis Platform API and make a first read
+    api: openapi/basis-analytics-api-openapi.yml
+    operations: ['GET /v1/me', 'GET /v1/agency']
+  - file: basis-campaign-delivery-report.md
+    name: Build a campaign delivery and performance report from Basis
+    api: openapi/basis-analytics-api-openapi.yml
+    operations:
+      - 'GET /v1/campaigns'
+      - 'GET /v1/campaigns/{id}'
+      - 'GET /v1/campaigns/{campaign_id}/line_items'
+      - 'GET /v1/campaigns/{campaign_id}/addons'
+      - 'GET /v1/stats/{scope}'
+      - 'GET /v1/kpis'
+  - file: basis-sync-account-hierarchy.md
+    name: Sync the Basis account hierarchy and reference taxonomy
+    api: openapi/basis-analytics-api-openapi.yml
+    operations:
+      - 'GET /v1/agency'
+      - 'GET /v1/clients'
+      - 'GET /v1/brands'
+      - 'GET /v1/campaigns'
+      - 'GET /v1/vendors'
+      - 'GET /v1/properties'
+      - 'GET /v1/verticals'
+      - 'GET /v1/kpis'
+      - 'GET /v1/creatives'
+      - 'GET /v1/conversions'
+      - 'GET /v1/delivery_sources'
+scope_note: >-
+  Only read flows exist. All 31 published Basis operations are GET, so there is no
+  create/update/campaign-launch skill to write. Writing one would require
+  operations Basis does not publish.

@@ -1,0 +1,882 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Basis Platform Analytics API",
+    "version": "v1"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Analytics",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "GET /v1/me",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/me",
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns the currently authenticated user"
+        },
+        {
+          "info": {
+            "name": "GET /v1/agency",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/agency",
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for the agency, the organization representing a buyer."
+        },
+        {
+          "info": {
+            "name": "GET /v1/brands/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/brands/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single brand."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for one brand."
+        },
+        {
+          "info": {
+            "name": "GET /v1/brands",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/brands",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              },
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "Used to refine the results by a chosen parameter. Valid parameters = name"
+              },
+              {
+                "name": "client_id",
+                "value": "",
+                "type": "query",
+                "description": "Identifies a single client. Set this parameter to limit the brands to the specified client."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all brands."
+        },
+        {
+          "info": {
+            "name": "GET /v1/clients/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/clients/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single client."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for one client. An agency can represent multiple clients, and each client can have multiple brands."
+        },
+        {
+          "info": {
+            "name": "GET /v1/clients",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/clients",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              },
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "Used to refine the results by a chosen parameter. Valid parameters are name, contact_first_name, contact_last_name, contact_email, billing_name, notes"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all clients."
+        },
+        {
+          "info": {
+            "name": "GET /v1/vendors/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/vendors/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single vendor."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for one vendor, an entity or organization selling and offering products, content, or services for payment. Examples of vendors would include the owners of websites that offer advertisement space and exchanges that offers ad space on multiple websites."
+        },
+        {
+          "info": {
+            "name": "GET /v1/vendors",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/vendors",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              },
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "Used to refine the results by a chosen parameter. Valid parameters = name"
+              },
+              {
+                "name": "campaign_id",
+                "value": "",
+                "type": "query",
+                "description": "Identifies a single campaign."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all vendors, entities or organizations selling and offering products, content, or services for payment. Examples of vendors would include the owners of websites that offer advertisement space and exchanges that offers ad space on multiple websites."
+        },
+        {
+          "info": {
+            "name": "GET /v1/properties/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/properties/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single property."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for one property--inventory (advertising space) available for sale, often a website or network."
+        },
+        {
+          "info": {
+            "name": "GET /v1/properties",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/properties",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              },
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "Used to refine the results by a chosen parameter. Valid parameters = name"
+              },
+              {
+                "name": "campaign_id",
+                "value": "",
+                "type": "query",
+                "description": "Identifies a single campaign."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all properties, inventory (advertising space) available for sale, often websites or networks."
+        },
+        {
+          "info": {
+            "name": "GET /v1/campaigns/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/campaigns/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single campaign."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for a single campaign."
+        },
+        {
+          "info": {
+            "name": "GET /v1/campaigns",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/campaigns",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              },
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "Used to refine the results by a chosen parameter. Valid parameters are name, ugcid, initiative_name"
+              },
+              {
+                "name": "client_id",
+                "value": "",
+                "type": "query",
+                "description": "Identifies a single client. Set this parameter to limit the campaigns to the specified client."
+              },
+              {
+                "name": "status",
+                "value": "",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all campaigns."
+        },
+        {
+          "info": {
+            "name": "GET /v1/campaigns/{campaign_id}/line_items/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/campaigns/:campaign_id/line_items/:id",
+            "params": [
+              {
+                "name": "campaign_id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single campaign."
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single line item."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for a single line item."
+        },
+        {
+          "info": {
+            "name": "GET /v1/campaigns/{campaign_id}/line_items",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/campaigns/:campaign_id/line_items",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              },
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "Used to refine the results by a chosen parameter. Valid parameter = name"
+              },
+              {
+                "name": "campaign_id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single campaign."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all line items for one campaign."
+        },
+        {
+          "info": {
+            "name": "GET /v1/campaigns/{campaign_id}/addons/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/campaigns/:campaign_id/addons/:id",
+            "params": [
+              {
+                "name": "campaign_id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single campaign."
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single add-on."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for a single add-on. An add-on is a fee for a service that is billed outside of the campaign's line items."
+        },
+        {
+          "info": {
+            "name": "GET /v1/campaigns/{campaign_id}/addons",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/campaigns/:campaign_id/addons",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              },
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "Used to refine the results by a chosen parameter. Valid parameters = name"
+              },
+              {
+                "name": "campaign_id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single campaign."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists add-ons for a single campaign. An add-on is a fee for an additional service that is billed outside of line items."
+        },
+        {
+          "info": {
+            "name": "GET /v1/verticals/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/verticals/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single vertical."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for a single vertical, the market or category type for a vendor, property, or brand."
+        },
+        {
+          "info": {
+            "name": "GET /v1/verticals",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/verticals",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              },
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "Used to refine the results by a chosen parameter. Valid parameter = name"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all verticals, the market or category types for a vendor, property, or brand."
+        },
+        {
+          "info": {
+            "name": "GET /v1/kpis/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/kpis/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single Key Performance Indicator (KPI)."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for a single Key Performance Indicator (KPI)."
+        },
+        {
+          "info": {
+            "name": "GET /v1/kpis",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/kpis",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              },
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "Used to refine the results by a chosen parameter. Valid parameter = name"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all Key Performance Indicators (KPI)"
+        },
+        {
+          "info": {
+            "name": "GET /v1/creatives/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/creatives/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single creative."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for a single creative."
+        },
+        {
+          "info": {
+            "name": "GET /v1/creatives",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/creatives",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all creatives."
+        },
+        {
+          "info": {
+            "name": "GET /v1/delivery_sources/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/delivery_sources/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single delivery source."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for one delivery source."
+        },
+        {
+          "info": {
+            "name": "GET /v1/delivery_sources",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/delivery_sources",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all delivery sources, which provide delivery data used for statistics."
+        },
+        {
+          "info": {
+            "name": "GET /v1/conversions/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/conversions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single conversion."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for a single conversion."
+        },
+        {
+          "info": {
+            "name": "GET /v1/conversions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/conversions",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all conversions."
+        },
+        {
+          "info": {
+            "name": "GET /v1/groups/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/groups/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single group id. In the absence of this id, all groups that this user has access to should be returned."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for a single Group."
+        },
+        {
+          "info": {
+            "name": "GET /v1/groups",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/groups",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              },
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "Used to refine the results by a chosen parameter. Valid parameter = name"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all Groups."
+        },
+        {
+          "info": {
+            "name": "GET /v1/tactics/{id}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/tactics/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Identifies a single tactic id. In the absence of this id, all tactics that this user has access to should be returned."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns details for a single Tactic."
+        },
+        {
+          "info": {
+            "name": "GET /v1/tactics",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/tactics",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              },
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "Used to refine the results by a chosen parameter. Valid parameter = name"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Lists all Tactics."
+        },
+        {
+          "info": {
+            "name": "GET /v1/stats/{scope}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.basis.net/v1/stats/:scope",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Used to paginate through the list of records. Don't set this parameter to see the first page of records, then check the metadata object in the response for the cursor to use to fetch the next page."
+              },
+              {
+                "name": "brand_id",
+                "value": "",
+                "type": "query",
+                "description": "Identifies a single brand. Set this parameter to limit the statistics to the specified brand."
+              },
+              {
+                "name": "client_id",
+                "value": "",
+                "type": "query",
+                "description": "Identifies a single client. Set this parameter to limit the statistics to the specified client."
+              },
+              {
+                "name": "campaign_id",
+                "value": "",
+                "type": "query",
+                "description": "Identifies a single campaign. Set this parameter to limit the statistics to the specified campaign."
+              },
+              {
+                "name": "line_item_id",
+                "value": "",
+                "type": "query",
+                "description": "Identifies a single line item. Set this parameter to limit the statistics to the specified line item."
+              },
+              {
+                "name": "line_item_lineage_id",
+                "value": "",
+                "type": "query",
+                "description": "Identifies a single line item across revisions."
+              },
+              {
+                "name": "start_date",
+                "value": "",
+                "type": "query",
+                "description": "The earliest date of statistics collection. Format: yyyy-mm-dd"
+              },
+              {
+                "name": "end_date",
+                "value": "",
+                "type": "query",
+                "description": "The last date of statistics collection. Format: yyyy-mm-dd"
+              },
+              {
+                "name": "scope",
+                "value": "",
+                "type": "path",
+                "description": "\nDefines the granularity and grouping of the statistics to return.<br>\n`line_item:` Statistics show totals for each line item for all days in the date range.<br>\n`daily_by_line_item:` Statistics show totals for each day in the date range for each line item.<br>\n`daily:` Statistics show totals for each day in the date range for each creative.<br>\n`daily_by_conversion:` Statistics show a granular breakout of conversion metrics for each day in the date range.\n"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieves statistics."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

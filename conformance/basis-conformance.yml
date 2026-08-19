@@ -1,0 +1,133 @@
+generated: '2026-08-13'
+method: searched
+source: >-
+  Derived from openapi/basis-analytics-api-openapi.yml (securitySchemes, error
+  schemas, pagination parameters) and from documents Basis publishes:
+  https://api.basis.net/swagger.json,
+  https://auth.basis.net/.well-known/openid-configuration (HTTP 200),
+  https://auth.basis.net/.well-known/oauth-authorization-server (HTTP 200) and
+  https://privacy.basis.com/ (HTTP 200). Every entry names the evidence it rests
+  on; nothing is asserted from category expectation.
+standards:
+  - id: oauth2
+    conforms: true
+    evidence: >-
+      The Basis Platform API is protected by OAuth 2.0. The authorization server
+      at https://auth.basis.net publishes RFC 6749 endpoints (/authorize,
+      /oauth/token, /oauth/revoke) and supports the authorization_code,
+      client_credentials and refresh_token grants.
+  - id: rfc8414-oauth-authorization-server-metadata
+    conforms: true
+    evidence: >-
+      https://auth.basis.net/.well-known/oauth-authorization-server returns 200
+      with a valid metadata document (saved verbatim to
+      well-known/basis-oauth-authorization-server.json).
+  - id: oidc
+    conforms: true
+    evidence: >-
+      https://auth.basis.net/.well-known/openid-configuration returns 200 with a
+      full OpenID Connect Discovery 1.0 document — issuer, jwks_uri, userinfo
+      endpoint, claims_supported, id_token signing algorithms.
+  - id: rfc7636-pkce
+    conforms: true
+    evidence: >-
+      code_challenge_methods_supported = [S256, plain] in the discovery document.
+  - id: rfc9728-oauth-protected-resource
+    conforms: false
+    evidence: >-
+      No /.well-known/oauth-protected-resource on api.basis.net (404) — the API
+      host advertises no protected-resource metadata, so a client cannot discover
+      the authorization server mechanically; it is named only in prose.
+  - id: rfc9116-security-txt
+    conforms: false
+    evidence: >-
+      /.well-known/security.txt returns 404 on basis.com, api.basis.net and
+      auth.basis.net. See well-known/basis-well-known.yml.
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: >-
+      Errors are returned as {"message": ...} with application/json, not
+      application/problem+json. See errors/basis-problem-types.yml.
+  - id: rfc8594-sunset-header
+    conforms: false
+    evidence: >-
+      No Sunset or Deprecation headers documented; no deprecation policy
+      published. See lifecycle/basis-lifecycle.yml.
+  - id: pagination
+    conforms: true
+    evidence: >-
+      Cursor pagination on every list endpoint — `cursor` query parameter,
+      `metadata.cursor` / `metadata.page_size` / `metadata.total` response
+      envelope.
+  - id: idempotency
+    conforms: false
+    evidence: >-
+      No idempotency key or replay contract published. The v1 surface is
+      read-only (31 GET operations), so no write-side idempotency contract exists.
+  - id: openapi
+    conforms: true
+    evidence: >-
+      Basis serves a valid OpenAPI 3.0.0 document at
+      https://api.basis.net/swagger.json (HTTP 200, 31 operations).
+  - id: json-schema
+    conforms: true
+    evidence: >-
+      Request parameters and response bodies are described with inline JSON
+      Schema, including regex-constrained identifier patterns and enums.
+  - id: asyncapi
+    conforms: false
+    evidence: >-
+      No event, streaming or webhook surface is published for the Basis Platform
+      API, so there is nothing for an AsyncAPI document to describe.
+  - id: openrtb
+    conforms: unknown
+    evidence: >-
+      Basis operates a DSP that transacts real-time bidding, which in practice
+      requires IAB OpenRTB on the exchange side, but Basis publishes no OpenRTB
+      conformance statement and the public Analytics API is not a bidding
+      interface. Recorded as unknown rather than assumed.
+compliance:
+  published: true
+  source: https://privacy.basis.com/
+  programs:
+    - name: EU-U.S. Data Privacy Framework
+      status: participant
+      evidence: >-
+        "Basis Technologies is responsible for the processing of personal
+        information it receives under the Data Privacy Framework and subsequently
+        transfers to a third-party acting as an agent on its behalf." —
+        https://privacy.basis.com/
+    - name: IAB (Interactive Advertising Bureau)
+      status: member in good standing
+      evidence: >-
+        "Basis Technologies is a member in good standing with the Interactive
+        Advertising Bureau" — https://privacy.basis.com/
+    - name: Digital Advertising Alliance (DAA) Self-Regulatory Principles
+      status: participant
+      evidence: >-
+        "…is a participant in the Digital Advertising Alliance ('DAA') following
+        the Self-Regulatory Principles for Online Advertising, including its
+        'AdChoices' program." — https://privacy.basis.com/
+    - name: GDPR
+      status: data-subject rights honored
+      evidence: EU data subject rights section, https://privacy.basis.com/
+    - name: CCPA / U.S. state privacy laws
+      status: consumer opt-out honored
+      evidence: >-
+        Consumer Opt-Out Choices section and OneTrust privacy request webform,
+        https://privacy.basis.com/
+  certifications_not_published:
+    - SOC 2
+    - ISO 27001
+    - PCI DSS
+    - HIPAA
+    - FedRAMP
+  note: >-
+    Basis publishes privacy-and-advertising compliance programs but no security
+    certification report or trust center. probe-security-programs.py found no
+    trust center and no vulnerability-disclosure program on 2026-08-13.
+related:
+  - well-known/basis-well-known.yml
+  - errors/basis-problem-types.yml
+  - lifecycle/basis-lifecycle.yml
+  - security/basis-domain-security.yml

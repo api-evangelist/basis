@@ -1,0 +1,77 @@
+generated: '2026-08-13'
+method: searched
+source: >-
+  "Getting Started" section of the Basis Platform API description published at
+  https://api.basis.net/swagger.json (fetched 2026-08-13, HTTP 200), plus a live
+  DNS/HTTP probe of the sandbox host on the same date.
+description: >-
+  Basis documents a testing sandbox that mirrors the production API on a separate
+  host. It is a full separate environment rather than a test-mode key prefix —
+  there is no sk_test/sk_live style split, and no magic test values are published.
+  Sandbox credentials are issued by a Basis representative alongside production
+  credentials; nothing here is self-serve.
+docs: https://api.basis.net/swagger.json
+
+environments:
+  - name: production
+    base_url: https://api.basis.net/v1
+    evidence: >-
+      "All production API requests are made to https://api.basis.net/v1."
+    probe: {url: 'https://api.basis.net/swagger.json', status: 200, checked: '2026-08-13'}
+  - name: sandbox
+    base_url: https://api-sandbox.basis.net/v1
+    evidence: >-
+      "There is also a testing sandbox to use when developing and testing
+      applications, with requests being made to
+      https://api-sandbox.basis.net/v1."
+    probe:
+      url: https://api-sandbox.basis.net/v1
+      status: null
+      result: DNS NXDOMAIN — the host did not resolve from a public resolver
+      checked: '2026-08-13'
+    note: >-
+      Recorded exactly as observed. The sandbox is documented by Basis but its
+      hostname does not resolve publicly, so it is either DNS-restricted to
+      customer networks or the documented hostname is stale. A prospective
+      integrator cannot reach it without contacting Basis.
+
+separation_model: separate-host
+key_prefixes: null
+test_mode_flag: null
+test_values:
+  published: false
+  note: >-
+    No test card numbers, magic identifiers, seeded fixtures, or simulator values
+    are published. Basis is not a payments provider; the sandbox is expected to be
+    seeded with the customer's own agency data.
+test_clocks: false
+fixture_tooling: null
+
+credentials:
+  self_serve: false
+  process: >-
+    "The Basis API is available to Centro customers and integration partners, and
+    all organizations must acquire valid credentials prior to using the web
+    services. Contact your Centro representative to obtain valid credentials."
+  contact: https://basis.com/connect
+  note: >-
+    Basis's own documentation still refers to the company by its former name,
+    Centro, in the credentials instructions.
+
+interactive_console:
+  present: true
+  kind: embedded try-it in the published API documentation
+  evidence: >-
+    "To try the endpoints within this documentation, click Authorize below, and
+    use a token obtained via any of the above methods to fill in the 'Bearer'
+    field."
+  url: null
+  note: >-
+    The specification describes an Authorize button, which means Basis renders
+    this OpenAPI in a Swagger-UI-style console somewhere; no public URL for that
+    rendering was found. https://api.basis.net/ redirects to the raw
+    swagger.json, and api.basis.net/docs, /documentation and /redoc all 404.
+
+related:
+  - authentication/basis-authentication.yml
+  - conventions/basis-conventions.yml

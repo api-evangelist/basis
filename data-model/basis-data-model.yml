@@ -1,0 +1,172 @@
+generated: '2026-08-13'
+method: derived
+source: >-
+  Derived from openapi/basis-analytics-api-openapi.yml — the response schemas of
+  all 31 operations, their id-reference fields (client_id, brand_id, campaign_id,
+  kpi_id, property_id, vendor_id, group_id, line_item_id, creative_id,
+  delivery_source_id, conversion_id) and the "Resource Relationships" section
+  Basis publishes in the specification's own info.description.
+docs: https://api.basis.net/swagger.json
+notation: >-
+  relationships use has_one / has_many / belongs_to with the foreign-key field
+  name; direction is from the entity that owns the reference.
+description: >-
+  The Basis Analytics API's entity graph: an agency represents clients, clients
+  own brands and campaigns, campaigns break into line items and add-ons, and
+  delivery is measured through a statistics facet keyed by line item, creative,
+  delivery source and conversion.
+
+id_formats:
+  uuid_v4: [Brand, Client, Campaign, LineItem, AddOn, Group, Tactic, Conversion, DeliverySource]
+  numeric_string: [Vertical, KPI]
+  alphanumeric_40: [Creative]
+  unconstrained_string: [Agency, Property, User]
+  note: >-
+    Identifier format varies by resource — see
+    conventions/basis-conventions.yml#identifiers. An agent must not assume UUID.
+
+entities:
+  - name: Agency
+    endpoint: /v1/agency
+    domain: org
+    description: The organization representing clients and buying media on their behalf.
+    fields: [id, name, dsp_advertiser_id, created_at]
+  - name: User
+    endpoint: /v1/me
+    domain: org
+    description: The authenticated user behind an authorization-code token.
+    fields: [id, first_name, last_name, email]
+    note: Returns 404 under a client_credentials token (organization, not user).
+  - name: Client
+    endpoint: /v1/clients
+    domain: org
+    description: An advertiser the agency represents. An agency can represent many.
+    fields: [id, name, billing_name, contact_first_name, contact_last_name, contact_email, contact_phone, contact_extension, notes, created_at]
+  - name: Brand
+    endpoint: /v1/brands
+    domain: org
+    description: A brand belonging to a client, categorized by vertical.
+    fields: [id, name, verticals, subverticals, created_at]
+  - name: Vertical
+    endpoint: /v1/verticals
+    domain: taxonomy
+    description: The market or category type for a vendor, property or brand.
+    fields: [id, name, created_at]
+  - name: Subvertical
+    endpoint: null
+    domain: taxonomy
+    description: A narrower category nested inside a vertical; returned inline, never listed on its own.
+    fields: [id, name, created_at]
+  - name: Campaign
+    endpoint: /v1/campaigns
+    domain: planning
+    description: A media initiative for one client and one brand, with a budget, flight dates, objectives and a KPI.
+    fields: [id, name, client_id, brand_id, status, goal, objectives, kpi_name, approved_budget, start_date, end_date, initiative_name, account_team, ugcid, created_at]
+    filters: [status (live|approved|completed), client_id, brand_id, query]
+  - name: LineItem
+    endpoint: /v1/campaigns/{campaign_id}/line_items
+    domain: planning
+    description: A single media purchase or programmatic buy inside a campaign — the unit delivery is measured against.
+    fields: [id, name, campaign_id, property_id, vendor_id, kpi_id, kpi_goal, type, advertising_channel, formats, platforms, ad_sizes, media_rate, rate_type, media_spend_contracted, media_contracted_units, ad_server, ad_serving_cost, ad_serving_rate, ad_serving_rate_type, ad_serving_spend_contracted, ad_serving_estimated_impressions, ad_serving_estimated_clicks, total_spend_contracted, margin_pct_contracted, amount_gain_loss_contracted, media_plan, lineage, start_date, end_date]
+  - name: AddOn
+    endpoint: /v1/campaigns/{campaign_id}/addons
+    domain: planning
+    description: A fee attached to a campaign that is not a media buy.
+    fields: [id, name, campaign_id, addon_spend, addon_spend_contracted, approval_version, approved_at, media_plan, lineage, start_date, end_date]
+  - name: Group
+    endpoint: /v1/groups
+    domain: activation
+    description: A budget-and-pacing container in the DSP.
+    fields: [id, name, type, status, budget, amount, flight_dates, from, to, pacing_setting, even_delivery_enabled]
+  - name: Tactic
+    endpoint: /v1/tactics
+    domain: activation
+    description: A targeting/bidding strategy within a group.
+    fields: [id, name, group_id, type, status, budget, amount, default_bid, flight_dates, from, to, schedule, pacing_priority, even_delivery_enabled]
+  - name: Vendor
+    endpoint: /v1/vendors
+    domain: supply
+    description: An entity or organization selling and offering inventory.
+    fields: [id, name, type, created_at]
+  - name: Property
+    endpoint: /v1/properties
+    domain: supply
+    description: Inventory — the advertising space available from a vendor.
+    fields: [id, name, type, url, verticals, created_at]
+  - name: Creative
+    endpoint: /v1/creatives
+    domain: creative
+    description: An ad unit served against a line item.
+    fields: [id, name, media_type, ad_classification, pixel_size, external_ref, external_source]
+  - name: KPI
+    endpoint: /v1/kpis
+    domain: measurement
+    description: A key performance indicator and its goal type.
+    fields: [id, name, goal_type]
+  - name: Conversion
+    endpoint: /v1/conversions
+    domain: measurement
+    description: A tracked conversion event definition.
+    fields: [conversion_id, name, external_ref, external_source]
+  - name: DeliverySource
+    endpoint: /v1/delivery_sources
+    domain: measurement
+    description: A source that provides the delivery data statistics are computed from.
+    fields: [id, name, size, external_id, external_source]
+  - name: Stat
+    endpoint: /v1/stats/{scope}
+    domain: measurement
+    description: >-
+      The delivery/performance facet. Aggregation is chosen with the {scope} path
+      parameter — line_item, daily_by_line_item, daily, daily_by_conversion.
+    fields: [line_item_id, creative_id, delivery_source_id, conversion_id, delivered_date, data_through_date, actual_start_date, delivered_impressions, delivered_clicks, delivered_units, delivered_video_starts, delivered_video_completions, delivered_interactions, delivered_viewable_impressions, delivered_measurable_impressions, delivered_eligible_impressions, auctions_won, click_through_rate, click_conversions, click_conversion_revenue, delivered_total_conversions, delivered_view_conversions, delivered_inventory_spend, delivered_data_spend, ad_serving_spend, delivery_spend_pct, ecpm, ecpc, ecpv, ecpcv, ecpa, ecpvi, delivery_metrics, conversion_metrics, external_ad_ref]
+    filters: [line_item_id, line_item_lineage_id, campaign_id, start_date, end_date]
+
+relationships:
+  - {from: Agency, to: Client, kind: has_many, via: implicit (token owner)}
+  - {from: Client, to: Brand, kind: has_many, via: client_id}
+  - {from: Client, to: Campaign, kind: has_many, via: client_id}
+  - {from: Brand, to: Campaign, kind: has_many, via: brand_id}
+  - {from: Brand, to: Vertical, kind: has_many, via: verticals}
+  - {from: Brand, to: Subvertical, kind: has_many, via: subverticals}
+  - {from: Vertical, to: Subvertical, kind: has_many, via: subverticals}
+  - {from: Campaign, to: Client, kind: belongs_to, via: client_id}
+  - {from: Campaign, to: Brand, kind: belongs_to, via: brand_id}
+  - {from: Campaign, to: LineItem, kind: has_many, via: campaign_id}
+  - {from: Campaign, to: AddOn, kind: has_many, via: campaign_id}
+  - {from: LineItem, to: Campaign, kind: belongs_to, via: campaign_id}
+  - {from: LineItem, to: Property, kind: belongs_to, via: property_id}
+  - {from: LineItem, to: Vendor, kind: belongs_to, via: vendor_id}
+  - {from: LineItem, to: KPI, kind: belongs_to, via: kpi_id}
+  - {from: AddOn, to: Campaign, kind: belongs_to, via: campaign_id}
+  - {from: Tactic, to: Group, kind: belongs_to, via: group_id}
+  - {from: Group, to: Tactic, kind: has_many, via: group_id}
+  - {from: Property, to: Vertical, kind: has_many, via: verticals}
+  - {from: Property, to: Vendor, kind: belongs_to, via: implicit (vendor sells the property)}
+  - {from: Stat, to: LineItem, kind: belongs_to, via: line_item_id}
+  - {from: Stat, to: Creative, kind: belongs_to, via: creative_id}
+  - {from: Stat, to: DeliverySource, kind: belongs_to, via: delivery_source_id}
+  - {from: Stat, to: Conversion, kind: belongs_to, via: conversion_id}
+
+published_relationships:
+  source: 'Basis Platform API description, "Resource Relationships"'
+  text: >-
+    Campaigns have 1 client, 1 brand, many line items, many add-ons. Line items
+    have 1 campaign, 1 property, 1 vendor.
+
+gaps:
+  - >-
+    Group and Tactic are not linked to Campaign or LineItem by any published id
+    field, so the activation side of the graph cannot be joined to the planning
+    side through this API alone.
+  - >-
+    Property does not carry a vendor_id, so the vendor→property edge is stated in
+    prose but not navigable in the payloads.
+  - >-
+    Conversion uses `conversion_id` as its own primary key rather than `id`,
+    breaking the naming convention used everywhere else.
+
+related:
+  - conventions/basis-conventions.yml
+  - json-schema/
+  - vocabulary/basis-vocabulary.json
