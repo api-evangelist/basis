@@ -1,8 +1,13 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
   title: Basis Platform Analytics API
   version: v1
-  description: "\n# Introduction\n\nThe Basis API is designed to be easy to use and simple to test to help customers\nand partners get up and running quickly. Use the API endpoints to connect to\nBasis to retrieve campaign planning and delivery data. The current version of\nthe API is v1.\n\n# Getting Started\n\nThe Basis API is a RESTful API. This means that the API is designed to allow you\nto work with objects using familiar HTTP verbs.\n\n* read = GET\n* create = POST\n* update = PUT\n* delete = DELETE\n\nAll production API requests are made to [https://api.basis.net/v1](https://api.basis.net/v1).\nThere is also a testing sandbox to use when developing and testing applications,\nwith requests being made to [https://api-sandbox.basis.net/v1](https://api-sandbox.basis.net/v1).\nThe Basis API is available to Centro customers and integration partners, and all\norganizations must acquire valid credentials prior to using the web services.\nContact your Centro representative to obtain valid credentials.\n\n#### API Request Limits\n\nTo maintain optimum performance and ensure that the Basis Platform API is available to all our customers,\nBasis balances transaction loads by imposing rate limits of 75,000 requests per hour across all endpoints per API user.\n\nGenerating client credentials tokens is also limited to 10 per hour, with a maximum of 25 per day. More information\non this can be found in the Client Credentials Flow section below.\n\n# Authentication\n\nAll API endpoints require authentication.  Basis API uses [OAuth2](https://oauth.net/2/). Supported grant types:\n\n* [Authorization Code](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow)\n* [Client Credentials](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow)\n* [Refresh Token](https://auth0.com/docs/secure/tokens/refresh-tokens/use-refresh-tokens)\n\nThe password grant flow has now been deprecated. Please update your applications to use one of the above two flows.\n\nIf you encounter any issues or challenges while setting up the OAuth connection, please don't hesitate to contact us\nfor support.\n\nPlease note that OAuth authentication uses `https://auth.basis.net` not `https://api.basis.net`.\n\n#### Authorization Code Flow\n\nTo authorize your API access, visit the following URL in your browser, replacing\nplaceholders with your specific values as needed:\n\n`https://auth.basis.net/authorize?response_type=code&client_id=<client_id>&scope=openid profile email offline_access&state=<your state token>&redirect_uri=<redirect URI>&audience=https://api.basis.net`\n\nAfter successful authorization you will be redirected to your specified redirect\nURI and the authorization code as well as the `state` (more info\n[here](https://www.oauth.com/oauth2-servers/getting-ready/)) supplied in the\nrequest will be passed as parameters.\n\nOnce you have this auth code you will need to make a second request to get a token which\ncan be used to make API requests:\n\n```\ncurl -X POST https://auth.basis.net/oauth/token\n  --header 'Content-Type: application/x-www-form-urlencoded' \\\n  --data-urlencode 'grant_type=authorization_code' \\\n  --data-urlencode 'client_id=<your application ID>' \\\n  --data-urlencode 'client_secret=<your application secret>' \\\n  --data-urlencode 'code=<authorization code>' \\\n  --data-urlencode 'redirect_uri=<your application redirect URI>'\n```\n\nThis token can then be sent along with API requests in the Authorization header as\noutlined in the next section. If you want a refresh token as well, make sure to include\nthe `offline_access` scope in the /authorize request above.\n\nNote: In order to use this flow successfully, your application needs to have an associated\nredirect URI. If you did not previously have a redirect URI set and need to set one, reach\nout to Basis support.\n\n#### Client Credentials Flow\n\n```\ncurl --location 'https://auth.basis.net/oauth/token' \\\n  --header 'Content-Type: application/x-www-form-urlencoded' \\\n  --data-urlencode 'grant_type=client_credentials' \\\n  --data-urlencode 'client_id=<your application ID>' \\\n  --data-urlencode 'client_secret=<your application secret>' \\\n  --data-urlencode 'audience=https://api.basis.net'\n```\n\nA few important notes:\n* Your application must have an associated owner ID (i.e. agency ID) in order to use this flow. \n  It will return a 401 otherwise. If you did not previously have an owner ID set and need to set\n  one, reach out to Basis support.\n* This token returns all clients for an agency, so if there are restricted clients, we recommend\n  using the authorization code flow above.\n* Endpoints providing user information will return a 404, since this token is associated with\n  an organization, not a user.\n\n##### Client Credentials Token Quota\n\nClient credentials token generation is limited to **10 per hour**, with a maximum of **25 per day**.\nIf you exceed this limit, you'll receive a `429 Too Many Requests` error. Please reach out to\nBasis Support if you need to increase this limit.\n\nIf you receive this 429 error, you can check the headers of the response for real-time information\non your current usage and limits. See the\n[official Auth0 docs](https://auth0.com/docs/fine-grained-m2m-token-quotas-early-access#monitor-token-quota-consumption)\nfor more information.\n\n#### Refresh Token Flow\n```\ncurl --location 'https://auth.basis.net/oauth/token' \\\n  --header 'Content-Type: application/x-www-form-urlencoded' \\\n  --data-urlencode 'grant_type=refresh_token' \\\n  --data-urlencode 'client_id=<your application ID>' \\\n  --data-urlencode 'client_secret=<your application secret>' \\\n  --data-urlencode 'refresh_token=<your refresh token>' \\\n```\n\nA few important notes:\n* Only the authorization code flow returns a refresh token.\n* The refresh token can be used to obtain a new access token when the current one expires.\n* The refresh token flow will itself return a refresh token.\n\n#### Request Data\n\nOnce you have your access token from the token response you can make requests to\nthe API with header `Authorization: Bearer <access_token>`.\n\nFor example:\n\n```\ncurl -X GET \"https://api.basis.net/v1/agency\" -H \"Authorization: Bearer <access_token>\"\n```\n\nTo try the endpoints within this documentation, click **Authorize** below, and\nuse a token obtained via any of the above methods to fill in the \"Bearer\" field.\n\n# Analytics API\n\nThe analytics API gives you access to delivery statistics and details of your\nBasis resources:\n\n* agency\n* clients\n* brands\n* campaigns\n* line items\n* groups\n* tactics\n* add-ons\n* vendors\n* properties\n* verticals\n* key performance indicators (KPI)\n\n## Statistics\n\nRetrieve statistics by calling\n\n`GET /v1/stats/{scope}`\n\nUse the scope parameter to choose how the statistics are aggregated:\n\n* line_item\n* daily_by_line_item\n* daily\n\nA line item describes the details of a media purchase or programmatic buy.\nStatistics returned for each line item include delivery metrics, such as\nimpressions, clicks, and video completions, and performance metrics like eCPM,\neCPC, and eCPV.\n\n## Finding Resource Details\n\nMany of the Analytics API endpoints list all of a particular type of resource, like\n\n`GET /v1/brands`\n\nwhich returns a list of all of your brands, as well as the ID, name, creation\ntimestamp, and verticals for each.\n\nMany other endpoints return details for one resource, like\n\n`GET /v1/brands/{id}`\n\nwhich returns the ID, name, creation timestamp, and verticals for the brand with\nthe given brand ID.\n\n### Resource Relationships\n\nCampaigns have\n\n* 1 client\n* 1 brand\n* many line items\n* many add-ons\n\nLine items have\n\n* 1 campaign\n* 1 property\n* 1 vendor\n\nCampaign details returned by `GET /v1/campaigns/{id}` or `GET /v1/campaigns`\ninclude the client_id and brand_id for the campaign. To find the line items for\na campaign, call `GET /v1/campaigns/{id}/line_items`.\n"
+  description: '# Introduction
+
+
+    The Basis API is designed to be easy to use and simple to test to help customers
+
+    and partners get up and running quickly.'
 servers:
 - url: https://api.basis.net
 tags:
@@ -63,6 +68,10 @@ paths:
                 description: User not found
                 type: object
                 properties: {}
+      summary: Get me
+      x-summary-source: derived
+      operationId: getV1Me
+      x-operation-id-source: derived
   /v1/agency:
     get:
       tags:
@@ -101,6 +110,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get agency
+      x-summary-source: derived
+      operationId: getV1Agency
+      x-operation-id-source: derived
   /v1/brands/{id}:
     get:
       tags:
@@ -193,6 +206,10 @@ paths:
                 description: Brand not found
                 type: object
                 properties: {}
+      summary: Get brands by id
+      x-summary-source: derived
+      operationId: getV1BrandsById
+      x-operation-id-source: derived
   /v1/brands:
     get:
       tags:
@@ -303,6 +320,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get brands
+      x-summary-source: derived
+      operationId: getV1Brands
+      x-operation-id-source: derived
   /v1/clients/{id}:
     get:
       tags:
@@ -394,6 +415,10 @@ paths:
                 description: Client not found
                 type: object
                 properties: {}
+      summary: Get clients by id
+      x-summary-source: derived
+      operationId: getV1ClientsById
+      x-operation-id-source: derived
   /v1/clients:
     get:
       tags:
@@ -496,6 +521,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get clients
+      x-summary-source: derived
+      operationId: getV1Clients
+      x-operation-id-source: derived
   /v1/vendors/{id}:
     get:
       tags:
@@ -561,6 +590,10 @@ paths:
                 description: Vendor not found
                 type: object
                 properties: {}
+      summary: Get vendors by id
+      x-summary-source: derived
+      operationId: getV1VendorsById
+      x-operation-id-source: derived
   /v1/vendors:
     get:
       tags:
@@ -644,6 +677,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get vendors
+      x-summary-source: derived
+      operationId: getV1Vendors
+      x-operation-id-source: derived
   /v1/properties/{id}:
     get:
       tags:
@@ -732,6 +769,10 @@ paths:
                 description: Property not found
                 type: object
                 properties: {}
+      summary: Get properties by id
+      x-summary-source: derived
+      operationId: getV1PropertiesById
+      x-operation-id-source: derived
   /v1/properties:
     get:
       tags:
@@ -838,6 +879,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get properties
+      x-summary-source: derived
+      operationId: getV1Properties
+      x-operation-id-source: derived
   /v1/campaigns/{id}:
     get:
       tags:
@@ -970,6 +1015,10 @@ paths:
                 description: Campaign not found
                 type: object
                 properties: {}
+      summary: Get campaigns by id
+      x-summary-source: derived
+      operationId: getV1CampaignsById
+      x-operation-id-source: derived
   /v1/campaigns:
     get:
       tags:
@@ -1129,6 +1178,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get campaigns
+      x-summary-source: derived
+      operationId: getV1Campaigns
+      x-operation-id-source: derived
   /v1/campaigns/{campaign_id}/line_items/{id}:
     get:
       tags:
@@ -1311,6 +1364,10 @@ paths:
                 description: Campaign or line item not found
                 type: object
                 properties: {}
+      summary: Get campaigns by campaign id line items by id
+      x-summary-source: derived
+      operationId: getV1CampaignsByCampaignIdLineItemsById
+      x-operation-id-source: derived
   /v1/campaigns/{campaign_id}/line_items:
     get:
       tags:
@@ -1504,6 +1561,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get campaigns by campaign id line items
+      x-summary-source: derived
+      operationId: getV1CampaignsByCampaignIdLineItems
+      x-operation-id-source: derived
   /v1/campaigns/{campaign_id}/addons/{id}:
     get:
       tags:
@@ -1603,6 +1664,10 @@ paths:
                 description: Campaign or add-on not found
                 type: object
                 properties: {}
+      summary: Get campaigns by campaign id addons by id
+      x-summary-source: derived
+      operationId: getV1CampaignsByCampaignIdAddonsById
+      x-operation-id-source: derived
   /v1/campaigns/{campaign_id}/addons:
     get:
       tags:
@@ -1721,6 +1786,10 @@ paths:
                 description: Campaign not found
                 type: object
                 properties: {}
+      summary: Get campaigns by campaign id addons
+      x-summary-source: derived
+      operationId: getV1CampaignsByCampaignIdAddons
+      x-operation-id-source: derived
   /v1/verticals/{id}:
     get:
       tags:
@@ -1784,6 +1853,10 @@ paths:
                 description: Vertical not found
                 type: object
                 properties: {}
+      summary: Get verticals by id
+      x-summary-source: derived
+      operationId: getV1VerticalsById
+      x-operation-id-source: derived
   /v1/verticals:
     get:
       tags:
@@ -1858,6 +1931,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get verticals
+      x-summary-source: derived
+      operationId: getV1Verticals
+      x-operation-id-source: derived
   /v1/kpis/{id}:
     get:
       tags:
@@ -1921,6 +1998,10 @@ paths:
                 description: KPI not found
                 type: object
                 properties: {}
+      summary: Get kpis by id
+      x-summary-source: derived
+      operationId: getV1KpisById
+      x-operation-id-source: derived
   /v1/kpis:
     get:
       tags:
@@ -1995,6 +2076,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get kpis
+      x-summary-source: derived
+      operationId: getV1Kpis
+      x-operation-id-source: derived
   /v1/creatives/{id}:
     get:
       tags:
@@ -2080,6 +2165,10 @@ paths:
                 description: Creative not found
                 type: object
                 properties: {}
+      summary: Get creatives by id
+      x-summary-source: derived
+      operationId: getV1CreativesById
+      x-operation-id-source: derived
   /v1/creatives:
     get:
       tags:
@@ -2171,6 +2260,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get creatives
+      x-summary-source: derived
+      operationId: getV1Creatives
+      x-operation-id-source: derived
   /v1/delivery_sources/{id}:
     get:
       tags:
@@ -2249,6 +2342,10 @@ paths:
                 description: Delivery Source not found
                 type: object
                 properties: {}
+      summary: Get delivery sources by id
+      x-summary-source: derived
+      operationId: getV1DeliverySourcesById
+      x-operation-id-source: derived
   /v1/delivery_sources:
     get:
       tags:
@@ -2332,6 +2429,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get delivery sources
+      x-summary-source: derived
+      operationId: getV1DeliverySources
+      x-operation-id-source: derived
   /v1/conversions/{id}:
     get:
       tags:
@@ -2406,6 +2507,10 @@ paths:
                 description: Conversion not found
                 type: object
                 properties: {}
+      summary: Get conversions by id
+      x-summary-source: derived
+      operationId: getV1ConversionsById
+      x-operation-id-source: derived
   /v1/conversions:
     get:
       tags:
@@ -2485,6 +2590,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get conversions
+      x-summary-source: derived
+      operationId: getV1Conversions
+      x-operation-id-source: derived
   /v1/groups/{id}:
     get:
       tags:
@@ -2576,6 +2685,10 @@ paths:
                 description: Group not found
                 type: object
                 properties: {}
+      summary: Get groups by id
+      x-summary-source: derived
+      operationId: getV1GroupsById
+      x-operation-id-source: derived
   /v1/groups:
     get:
       tags:
@@ -2678,6 +2791,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get groups
+      x-summary-source: derived
+      operationId: getV1Groups
+      x-operation-id-source: derived
   /v1/tactics/{id}:
     get:
       tags:
@@ -2779,6 +2896,10 @@ paths:
                 description: Tactic not found
                 type: object
                 properties: {}
+      summary: Get tactics by id
+      x-summary-source: derived
+      operationId: getV1TacticsById
+      x-operation-id-source: derived
   /v1/tactics:
     get:
       tags:
@@ -2891,6 +3012,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get tactics
+      x-summary-source: derived
+      operationId: getV1Tactics
+      x-operation-id-source: derived
   /v1/stats/{scope}:
     get:
       tags:
@@ -3232,6 +3357,10 @@ paths:
                 properties:
                   message:
                     type: string
+      summary: Get stats by scope
+      x-summary-source: derived
+      operationId: getV1StatsByScope
+      x-operation-id-source: derived
 components:
   securitySchemes:
     OAuth2: {}

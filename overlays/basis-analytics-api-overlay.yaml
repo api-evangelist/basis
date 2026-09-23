@@ -3,9 +3,9 @@ info:
   title: API Evangelist enhancements for Basis Analytics API
   version: 1.0.0
 extends: openapi/basis-analytics-api-openapi.yml
-generated: '2026-08-13'
-method: generated
-source: openapi/basis-analytics-api-openapi.yml
+x-generated: '2026-08-13'
+x-method: generated
+x-source: openapi/basis-analytics-api-openapi.yml
 actions:
   - target: $.info
     update:
