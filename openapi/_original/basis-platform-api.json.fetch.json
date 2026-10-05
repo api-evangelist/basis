@@ -1,0 +1,12 @@
+{
+ "url": "https://api.basis.net/swagger.json",
+ "requested_url": "https://api.basis.net/swagger.json",
+ "status": 200,
+ "content_type": "application/json; charset=utf-8",
+ "bytes": 80248,
+ "sha256": "6e0eb87d51e62ba8fee28a66b426b054e211d512c72a37ae599aa7329833a39d",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "equivalent",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the provider's current document describes the same operations (Jaccard 1.0), but the bytes differ, so the archive is an earlier or reformatted copy."
+}
