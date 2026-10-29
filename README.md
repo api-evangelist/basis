@@ -64,33 +64,180 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Basis is an advertising automation platform providing REST APIs for programmatic DSP campaign management, audience targeting, publisher management, reporting, and omnichannel media buying automation. The platform covers display, video, audio, native, connected TV (CTV), digital out-of-home (DOOH), and site-direct advertising channels.
+Basis is an advertising automation platform providing REST APIs for programmatic DSP campaign management, audience targeting, publisher management, reporting, and omnichannel media buying automation across display, video, audio, native, connected TV, and site-direct channels.
 
-## Enterprise API
+**Areas:** Programmatic Advertising · DSP · Media Buying · Campaign Management · Audience Targeting · AdTech
 
-The Basis Enterprise API (base URL: `https://api.basis.net`) enables:
+## Basis on APIs.io
 
-- Campaign, tactic, and ad creation and management
-- Audience and conversion tracking management
-- Spend optimization and performance analysis
-- Access to 25,000+ audience segments from 30+ data providers
-- 200+ metrics and dimensions for reporting
-- OAuth 2.0 authentication (Client ID, Client Secret, Advertiser ID)
+Everything profiled for Basis is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/basis/](https://apis.io/providers/basis/)** — or go straight to one of the APIs or properties below.
 
-## Links
+### APIs (1)
 
-- **Website:** https://basis.com/
-- **Enterprise API:** https://basis.com/technology/enterprise-api
-- **API Docs:** https://api.basis.net/docs/
-- **Blog:** https://basis.com/blog
-- **LinkedIn:** https://www.linkedin.com/company/basis-technologies
-- **X:** https://twitter.com/basisglobaltech
-- **Contact:** https://basis.com/connect
+- [Basis Analytics API](https://apis.io/apis/basis/basis-analytics-api/) — The Analytics API from Basis — 31 operation(s) for analytics.
 
-## APIs.json
+### Published properties
 
-This repository contains an [APIs.json](apis.yml) profile for Basis following the APIs.json 0.19 specification, including:
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-- [plans/basis-plans-pricing.yml](plans/basis-plans-pricing.yml) - Pricing model details
-- [rate-limits/basis-rate-limits.yml](rate-limits/basis-rate-limits.yml) - API rate limit information
-- [finops/basis-finops.yml](finops/basis-finops.yml) - Financial operations guidance
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [Candidate tool surface derived from the Basis OpenAPI — Basis operates no MCP server](https://apis.io/servers/basis/candidate-tool-surface-derived-from-the-basis-openapi-basis-operates-no-mcp-server/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Basis Agentic Access](https://apis.io/agentic-access/basis/basis-agentic-access/)
+
+#### JSON Schema (17)
+
+The data models the API reads and writes.
+
+- [Agency Get](https://apis.io/schemas/basis/agency-get/)
+- [Brands Get](https://apis.io/schemas/basis/brands-get/)
+- [Campaigns Addons Get](https://apis.io/schemas/basis/campaigns-addons-get/)
+- [Campaigns Get](https://apis.io/schemas/basis/campaigns-get/)
+- [Campaigns Line_Items Get](https://apis.io/schemas/basis/campaigns-line_items-get/)
+- [Clients Get](https://apis.io/schemas/basis/clients-get/)
+- [Conversions Get](https://apis.io/schemas/basis/conversions-get/)
+- [Creatives Get](https://apis.io/schemas/basis/creatives-get/)
+- [Delivery_Sources Get](https://apis.io/schemas/basis/delivery_sources-get/)
+- [Groups Get](https://apis.io/schemas/basis/groups-get/)
+- [Kpis Get](https://apis.io/schemas/basis/kpis-get/)
+- [Me Get](https://apis.io/schemas/basis/me-get/)
+- [Properties Get](https://apis.io/schemas/basis/properties-get/)
+- [Stats Get](https://apis.io/schemas/basis/stats-get/)
+- [Tactics Get](https://apis.io/schemas/basis/tactics-get/)
+- [Vendors Get](https://apis.io/schemas/basis/vendors-get/)
+- [Verticals Get](https://apis.io/schemas/basis/verticals-get/)
+
+#### JSON-LD (1)
+
+Linked-data contexts for the provider's vocabulary.
+
+- [Basis Context](https://apis.io/jsonld/basis/basis-context/)
+
+#### Examples (1)
+
+Example requests and responses.
+
+- [Basis Api Examples](https://apis.io/examples/basis/basis-api-examples/)
+
+#### Collections (1)
+
+Postman and Open Collection request collections.
+
+- [Basis Platform Analytics API](https://apis.io/collections/basis/open-basis-analytics-api/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Basis Analytics Api Overlay](https://apis.io/overlays/basis/basis-analytics-api-overlay/)
+
+#### Governance rules (1)
+
+Spectral rulesets for the provider's contracts.
+
+- [Basis — jsonschema rules](https://apis.io/rules/basis/basis-jsonschema-spectral-rules/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Basis Authentication](https://apis.io/security/basis/basis-authentication/)
+- [Basis Domain Security](https://apis.io/security/basis/basis-domain-security/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Basis Scopes](https://apis.io/scopes/basis/basis-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Basis Plans Pricing](https://apis.io/plans/basis/basis-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Basis Rate Limits](https://apis.io/rate-limits/basis/basis-rate-limits/)
+
+#### FinOps (1)
+
+What the API costs to run, by operation.
+
+- [Basis Finops](https://apis.io/finops/basis/basis-finops/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://basis.com/)
+- [Documentation](https://basis.com/technology/enterprise-api)
+- [Pricing](https://basis.com/technology/enterprise-api)
+- [Sign up](https://platform.basis.net/auth/login)
+- [Support](https://basis.com/connect)
+- [Blog](https://basis.com/blog)
+- [Privacy policy](https://privacy.basis.com/)
+
+## API Evangelist rating
+
+**Kin Score 52.7** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 66.1 |
+| Contract quality | 60.2 |
+| Contract governance | 41.7 |
+| Operational transparency | 31.6 |
+| Developer ergonomics | 44.6 |
+| Access clarity | 50.0 |
+
+**Agent readiness 42.2** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | na |
+| MCP Server | — |
+| Auth Clarity | served (partial credit) |
+| Idempotency | na |
+| Error Semantics | derived (partial credit) |
+| OpenAPI Examples | documented (partial credit) |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | na |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | paginated |
+| Operation Distinctiveness | — |
+
+**Regulatory alignment 35.3** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/basis/](https://apis.io/providers/basis/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Basis: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/basis/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
